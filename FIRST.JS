@@ -48,7 +48,7 @@ let quizData = [
         question: "Which effect of deforestation leads to an increase in CO2 in the atmosphere?",
         options: ["Climate change", "Soil erosion", "Disturbance of water cycle","Overgrazing"],
         correct: "Climate change",
-    },    
+    },
 {
         question: "Desertification is the degradation of land in areas that are:",
         options: ["Tropical rainforests", "Glacier-covered", "Dry, semi-dry, and dry sub-humid", "Wetlands"],
@@ -135,7 +135,7 @@ let quizData = [
         correct: "Unidirectional",
     },
     {
-        question: ". A food web consists of several interconnected:",
+        question: "A food web consists of several interconnected:",
         options: ["Food chains", "Pyramids", "Ecosystems", "Trophic levels"],
         correct: "Food chains",
     },
@@ -172,27 +172,27 @@ let quizData = [
     {
         question: "Why does the ecological Pyramid of Energy universally maintain an upright geometry across all functioning ecosystems?",
         options: ["Apex predators maintain larger standing populations than baseline primary producers", "Progressive metabolic heat dissipation across successive trophic transfers ensures that energy availability declines with each step", "Aquatic zooplankton have longer lifespans than marine phytoplankton", "Decomposers continuously pump energy directly into apex consumer trophic tiers"],
-        correct: " Progressive metabolic heat dissipation across successive trophic transfers ensures that energy availability declines with each step",
+        correct: "Progressive metabolic heat dissipation across successive trophic transfers ensures that energy availability declines with each step",
     },
     {
         question: "An ecosystem is defined within ecological science as:",
-        options: ["An isolated biological population capable of physiological adaptation without environmental interaction", "An exclusively inorganic geomorphological landscape devoid of biotic assemblages", " A functional unit of nature wherein living organisms interact continuously among themselves and with their physical and chemical environment", "A synthetic urban infrastructure system managed exclusively through mechanical inputs"],
+        options: ["An isolated biological population capable of physiological adaptation without environmental interaction", "An exclusively inorganic geomorphological landscape devoid of biotic assemblages", "A functional unit of nature wherein living organisms interact continuously among themselves and with their physical and chemical environment", "A synthetic urban infrastructure system managed exclusively through mechanical inputs"],
         correct: "A functional unit of nature wherein living organisms interact continuously among themselves and with their physical and chemical environment",
     },
     {
         question: "Which hydrological category encompasses freshwater resources residing in rivers, natural lakes, engineered reservoirs, and surface ponds?",
-        options: ["Deep fossil groundwater", "Artesian connate storage", " Sub-crustal magmatic water", "Surface water"],
+        options: ["Deep fossil groundwater", "Artesian connate storage", "Sub-crustal magmatic water", "Surface water"],
         correct: "Surface water",
     },
     {
         question: "The National Mission for a Green India (GIM) operates as one of the specific functional programs established under which framework?",
-        options: [" The Central Ground Water Authority Directive", "The National Action Plan on Climate Change (NAPCC)", " The Coastal Zone Regulation Authority", " The National Biodiversity Action Taskforce"],
+        options: ["The Central Ground Water Authority Directive", "The National Action Plan on Climate Change (NAPCC)", "The Coastal Zone Regulation Authority", "The National Biodiversity Action Taskforce"],
         correct: "The National Action Plan on Climate Change (NAPCC)",
     },
     {
         question: "What is the core statutory objective of the Compensatory Afforestation Fund Management and Planning Authority (CAMPA)?",
-        options: ["Subsidizing commercial monoculture timber exports to global markets", " Collecting and managing financial resources paid by diversion agencies to execute compensatory afforestation for diverted forest lands", " Regulating urban residential water tariffs and industrial discharge permits", "Overseeing transboundary river water allocation treaties between regional states"],
-        correct: " Collecting and managing financial resources paid by diversion agencies to execute compensatory afforestation for diverted forest lands",
+        options: ["Subsidizing commercial monoculture timber exports to global markets", "Collecting and managing financial resources paid by diversion agencies to execute compensatory afforestation for diverted forest lands", "Regulating urban residential water tariffs and industrial discharge permits", "Overseeing transboundary river water allocation treaties between regional states"],
+        correct: "Collecting and managing financial resources paid by diversion agencies to execute compensatory afforestation for diverted forest lands",
     },
     {
         question: "Which resource represents an inexhaustible, renewable flow of energy?",
@@ -234,11 +234,11 @@ let quizData = [
         options: ["Only natural surroundings", "Total living and non-living components surrounding an organism", "Only atmospheric conditions", "Only biological organisms"],
         correct: "Total living and non-living components surrounding an organism",
     },
-     {
+    {
         question: "The environment is mainly divided into:",
         options: ["Natural and artificial", "Biotic and abiotic", "Physical and chemical", "Rural and urban"],
         correct: "Biotic and abiotic",
-    },  
+    },
     {
         question: "Which of the following is a biotic component?",
         options: ["Bacteria", "Water", "Temperature", "Soil"],
@@ -261,8 +261,8 @@ let quizData = [
     },
     {
         question: "The troposphere extends approximately from Earth's surface to:",
-        options: ["0–12 km", "1–2 km", "85–500 km", "50–85 km"],
-        correct: "0–12 km",
+        options: ["0-12 km", "1-2 km", "85-500 km", "50-85 km"],
+        correct: "0-12 km",
     },
     {
         question: "Most atmospheric water vapour is found in the:",
@@ -275,9 +275,9 @@ let quizData = [
         correct: "Stratosphere",
     },
     {
-        question: ". The stratosphere lies approximately between:",
-        options: ["0–8 km", "85–800 km", "12–50 km", "50–85 km"],
-        correct: "12–50 km",
+        question: "The stratosphere lies approximately between:",
+        options: ["0-8 km", "85-800 km", "12-50 km", "50-85 km"],
+        correct: "12-50 km",
     },
     {
         question: "Ozone protects living organisms primarily by absorbing harmful:",
@@ -291,11 +291,11 @@ let quizData = [
     },
     {
         question: "The mesosphere extends approximately from:",
-        options: ["0–12 km", "50–85 km", "12–50 km", "85–800 km"],
-        correct: "50–85 km",
+        options: ["0-12 km", "50-85 km", "12-50 km", "85-800 km"],
+        correct: "50-85 km",
     },
     {
-        question: ". Many incoming meteoroids burn up in the:",
+        question: "Many incoming meteoroids burn up in the:",
         options: ["Troposphere", "Stratosphere", "Exosphere", "Mesosphere"],
         correct: "Mesosphere",
     },
@@ -354,7 +354,6 @@ let quizData = [
         options: ["Is completely static", "Changes in structure and species composition over time", "Cannot recover from disturbance", "Contains only abiotic components"],
         correct: "Changes in structure and species composition over time",
     },
-    
 ];
 
 const quizContainer = document.querySelector(".quiz-container");
@@ -369,71 +368,70 @@ const MAX_QUESTIONS = 70;
 let timerInterval;
 
 const shuffleArray = array => {
-      return array.slice().sort(() => Math.random() - 0.5);
+    return array.slice().sort(() => Math.random() - 0.5);
 };
 
 quizData = shuffleArray(quizData);
+
 const resetLocalStorage = () => {
-    for (i = 0; i <MAX_QUESTIONS; i++) {
+    for (let i = 0; i < MAX_QUESTIONS; i++) {
         localStorage.removeItem(`userAnswer_${i}`);
     }
-}
-    resetLocalStorage();
-
+};
+resetLocalStorage();
 
 const checkAnswer = (e) => {
-  let UserAnswer = e.target.innerHTML;
-  if (UserAnswer === quizData[questionNumber].correct){
-  score++;
-  e.target.classList.add("correct");
-} else {
-   e.target.classList.add("incorrect");
-}
+    let userAnswer = e.target.innerHTML;
+    if (userAnswer === quizData[questionNumber].correct) {
+        score++;
+        e.target.classList.add("correct");
+    } else {
+        e.target.classList.add("incorrect");
+    }
 
-localStorage.setItem(`UserAnswer_${questionNumber}`, UserAnswer);
+    localStorage.setItem(`userAnswer_${questionNumber}`, userAnswer);
 
-let allOptions = document.querySelectorAll(".quiz-container .option")
-allOptions.forEach((o) => {
-    o.classList.add("disabled");
-});
+    let allOptions = document.querySelectorAll(".quiz-container .option");
+    allOptions.forEach((o) => {
+        o.classList.add("disabled");
+    });
 };
 
 const createQuestion = () => {
     clearInterval(timerInterval);
 
-  let secondsLeft = 19;
-  const timerDisply = document.querySelector(".quiz-container .timer");
-  timerDisply.classList.remove("danger");
+    let secondsLeft = 19;
+    const timerDisplay = document.querySelector(".quiz-container .timer");
+    timerDisplay.classList.remove("danger");
 
-  timerDisply.textContent = `Timer Left:20 Seconds`;
-  
-  timerInterval = setInterval(() => {
-    timerDisply.textContent = `Time Left: ${secondsLeft.toString().padStart(2, 0)} Seconds`;
-    secondsLeft--;
+    timerDisplay.textContent = "Time Left: 20 Seconds";
 
-    if(secondsLeft < 5) {
-        timerDisply.classList.add("danger")
-    }
+    timerInterval = setInterval(() => {
+        timerDisplay.textContent = `Time Left: ${secondsLeft.toString().padStart(2, '0')} Seconds`;
+        secondsLeft--;
 
-    if (secondsLeft <0) {
-        clearInterval(timerInterval);
-        displyNextQuestion();
-    }
-  },1000);
+        if (secondsLeft < 5) {
+            timerDisplay.classList.add("danger");
+        }
+
+        if (secondsLeft < 0) {
+            clearInterval(timerInterval);
+            displayNextQuestion();
+        }
+    }, 1000);
 
     options.innerHTML = "";
-   question.innerHTML = `<span class= 'question-number'>${questionNumber + 1}/${MAX_QUESTIONS}</span>${quizData[questionNumber].question}`;
-  
- quizData[questionNumber].options.forEach((o) => {
- const option = document.createElement("button");
- option.classList.add("option")
- option.innerHTML = o;
- option.addEventListener("click", (e) => {
-    checkAnswer(e);
- })
- options.appendChild(option);
- });
+    question.innerHTML = `<span class='question-number'>${questionNumber + 1}/${MAX_QUESTIONS}</span> ${quizData[questionNumber].question}`;
 
+    quizData[questionNumber].options.forEach((o) => {
+        const option = document.createElement("button");
+        option.classList.add("option");
+        option.innerHTML = o;
+        option.addEventListener("click", (e) => {
+            checkAnswer(e);
+        });
+        options.appendChild(option);
+    });
 };
 
 const retakeQuiz = () => {
@@ -445,82 +443,48 @@ const retakeQuiz = () => {
     createQuestion();
     quizResult.style.display = "none";
     quizContainer.style.display = "block";
-}
+};
 
-
-const displyQuizResult = () => {
+const displayQuizResult = () => {
     quizResult.style.display = "flex";
     quizContainer.style.display = "none";
     quizResult.innerHTML = "";
 
-    const resultHeading = document.createElement("h2")
-    resultHeading.innerHTML = ` You have scored ${score} out of ${MAX_QUESTIONS}.`;
+    const resultHeading = document.createElement("h2");
+    resultHeading.innerHTML = `You have scored ${score} out of ${MAX_QUESTIONS}.`;
     quizResult.appendChild(resultHeading);
 
- for(let i = 0; i <MAX_QUESTIONS; i++) {
-    const resultItem = document.createElement("div");
-    resultItem.classList.add("question-container");
+    for (let i = 0; i < MAX_QUESTIONS; i++) {
+        const resultItem = document.createElement("div");
+        resultItem.classList.add("question-container");
 
+        const userAnswer = localStorage.getItem(`userAnswer_${i}`);
 
+        resultItem.innerHTML = `
+            <div class="question">Question ${i + 1}: ${quizData[i].question}</div>
+            <div class="user-answer">Your answer: ${userAnswer || "Not answered"}</div>
+            <div class="correct-answer">Correct answer: ${quizData[i].correct}</div>`;
 
-
-
-    resultItem.innerHTML = `div class="question">Question${i + 1}: ${quizData[i].question}</div>
-    <div class="user-answer">Your answer: ${UserAnswer || "Not answered"}</div>
-    <div class="correct-answer">Correct answer: ${correctAnswer}</div>`;
-
-   quizResult.appendChild(resultItem);
-
- }
-};
-
-
- const retakeBtn = document.createElement("button");
- retakeBtn.classList.add("retake-btn");
- retakeBtn.innerHTML = 'Retake Quiz';
- retakeBtn.addEventListener("click",retakeQuiz)
- quizResult.appendChild(retakeBtn);
-
-
-createQuestion();
-
-const displyNextQuestion = () => {
-    if (questionNumber >= MAX_QUESTIONS - 1) {
-        displyQuizResult();
-        return;
+        quizResult.appendChild(resultItem);
     }
 
+    const retakeBtn = document.createElement("button");
+    retakeBtn.classList.add("retake-btn");
+    retakeBtn.innerHTML = "Retake Quiz";
+    retakeBtn.addEventListener("click", retakeQuiz);
+    quizResult.appendChild(retakeBtn);
+};
 
-
+const displayNextQuestion = () => {
+    if (questionNumber >= MAX_QUESTIONS - 1) {
+        displayQuizResult();
+        return;
+    }
 
     questionNumber++;
     createQuestion();
 };
 
-nextBtn.addEventListener("click", displyNextQuestion)
+nextBtn.addEventListener("click", displayNextQuestion);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+createQuestion();
