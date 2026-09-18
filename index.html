@@ -98,23 +98,6 @@
             color: #fff;
         }
 
-        .option.selected {
-            background: #1d3557;
-            color: #fff;
-        }
-
-        .fib-row input.selected {
-            outline: 3px solid #1d3557;
-        }
-
-        .fib-tick {
-            align-self: center;
-            color: #16a34a;
-            font-weight: 700;
-            font-size: 14px;
-            white-space: nowrap;
-        }
-
         .fib-row {
             display: flex;
             gap: 12px;
@@ -204,10 +187,6 @@
             cursor: not-allowed;
         }
 
-        .next-btn.submit {
-            background: #16a34a;
-        }
-
         .hidden {
             display: none !important;
         }
@@ -259,7 +238,6 @@
 
         .dot.g { background: #51e351; }
         .dot.r { background: #e63946; }
-        .dot.w { background: #fff; border: 1px solid #bbb; }
 
         .question-container {
             text-align: left;
@@ -302,31 +280,24 @@
 
         .question-container .user-answer,
         .question-container .correct-answer {
-            color: #222;
+            color: #fff;
             font-size: 14px;
         }
 
         .user-answer.good {
-            color: #16a34a;
+            color: #fff;
             font-weight: 700;
         }
 
         .user-answer.bad {
-            color: #e63946;
+            color: #fff;
             font-weight: 700;
         }
 
         .correct-answer {
-            color: #16a34a;
+            color: #fff;
             font-weight: 700;
             font-size: 14px;
-        }
-
-        .question-container.correct-item .user-answer,
-        .question-container.correct-item .correct-answer,
-        .question-container.incorrect-item .user-answer,
-        .question-container.incorrect-item .correct-answer {
-            color: #fff;
         }
 
         .quiz-result .retake-btn {
@@ -359,12 +330,10 @@
     <div class="options"></div>
     <div class="fib-row hidden" id="fibRow">
         <input type="text" id="fibInput" placeholder="Type your answer here…" autocomplete="off">
-        <span class="fib-tick hidden" id="fibTick">✓ Selected</span>
-        <button class="fib-submit" id="fibSubmit">Save</button>
+        <button class="fib-submit" id="fibSubmit">Check</button>
     </div>
     <div class="nav-row">
         <button class="next-btn prev" id="prevBtn">Previous</button>
-        <button class="next-btn submit" id="submitBtn">Submit</button>
         <button class="next-btn" id="nextBtn">Next</button>
     </div>
 </div>
@@ -383,11 +352,9 @@ const questionEl = document.querySelector(".quiz-container .question");
 const optionsEl = document.querySelector(".quiz-container .options");
 const nextBtn = document.getElementById("nextBtn");
 const prevBtn = document.getElementById("prevBtn");
-const submitBtn = document.getElementById("submitBtn");
 const fibRow = document.getElementById("fibRow");
 const fibInput = document.getElementById("fibInput");
 const fibSubmit = document.getElementById("fibSubmit");
-const fibTick = document.getElementById("fibTick");
 
 const MAX_QUESTIONS = QUESTIONS.length;
 const SECONDS_PER_QUESTION = 25;
@@ -396,7 +363,6 @@ const TEST_DURATION = MAX_QUESTIONS * SECONDS_PER_QUESTION;
 let active = [];
 let questionNumber = 0;
 let score = 0;
-let answered = 0;
 let timeLeft = 0;
 let timerInterval;
 
@@ -473,67 +439,84 @@ const startTestTimer = () => {
     }, 1000);
 };
 
-function currentAnswer() {
-    return localStorage.getItem(`userAnswer_${questionNumber}`) || "";
+function checkAnswer(userAnswer, el) {
+    const q = active[questionNumber];
+    const correct = correctText(q);
+    const ok = isCorrect(q, userAnswer);
+
+    if (ok) {
+        score++;
+        el.classList.add("correct");
+    } else {
+        el.classList.add("incorrect");
+    }
+
+    localStorage.setItem(`userAnswer_${questionNumber}`, String(userAnswer).trim());
+
+    const allOptions = document.querySelectorAll(".quiz-container .option");
+    allOptions.forEach(o => o.classList.add("disabled"));
+    fibInput.disabled = true;
+    fibSubmit.disabled = true;
+
+    if (!ok) {
+        allOptions.forEach(o => {
+            if (o.textContent.trim() === correct) o.classList.add("correct");
+        });
+    }
 }
 
-function selectAnswer(val) {
-    const key = `userAnswer_${questionNumber}`;
-    const prev = localStorage.getItem(key);
-    const newVal = String(val).trim();
-    localStorage.setItem(key, newVal);
-
-    const wasAnswered = !!(prev && prev.trim());
-    const nowAnswered = !!newVal;
-    if (!wasAnswered && nowAnswered) answered++;
-    else if (wasAnswered && !nowAnswered) answered--;
-}
-
-function buildOptions(q) {
+function buildOptions(q, savedUser) {
     optionsEl.innerHTML = "";
     fibRow.classList.add("hidden");
     optionsEl.classList.remove("hidden");
 
-    const cur = currentAnswer();
+    const correct = correctText(q);
+    const locked = savedUser != null;
     const qs = q.type === "tf" ? ["True", "False"] : q.opts.map(o => o.t);
+
     qs.forEach(o => {
         const option = document.createElement("button");
-        const isSel = o === cur;
         option.classList.add("option");
-        if (isSel) option.classList.add("selected");
-        option.textContent = (isSel ? "✓ " : "") + o;
-        option.addEventListener("click", () => {
-            selectAnswer(o);
-            buildOptions(q);
-        });
+        option.textContent = o;
+        if (locked) {
+            option.classList.add("disabled");
+            if (o === correct) option.classList.add("correct");
+            if (o === String(savedUser).trim() && o !== correct) option.classList.add("incorrect");
+        } else {
+            option.addEventListener("click", () => checkAnswer(o, option));
+        }
         optionsEl.appendChild(option);
     });
 }
 
-function buildFib(q) {
+function buildFib(q, savedUser) {
     optionsEl.classList.add("hidden");
     fibRow.classList.remove("hidden");
-    fibInput.classList.remove("selected");
-    fibInput.disabled = false;
-    fibSubmit.disabled = false;
-    fibInput.value = currentAnswer();
-    fibTick.classList.toggle("hidden", !fibInput.value.trim());
-}
+    fibInput.classList.remove("correct", "incorrect");
+    fibInput.value = savedUser != null ? savedUser : "";
 
-function updateFibTick() {
-    fibTick.classList.toggle("hidden", !fibInput.value.trim());
-    selectAnswer(fibInput.value);
+    if (savedUser != null) {
+        fibInput.disabled = true;
+        fibSubmit.disabled = true;
+        fibInput.classList.add(isCorrect(q, savedUser) ? "correct" : "incorrect");
+    } else {
+        fibInput.disabled = false;
+        fibSubmit.disabled = false;
+        fibInput.focus();
+    }
 }
 
 function createQuestion() {
+    optionsEl.innerHTML = "";
     const q = active[questionNumber];
+    const savedUser = localStorage.getItem(`userAnswer_${questionNumber}`);
     const tq = q.t.replace(/^True\/False:\s*/, "");
     questionEl.innerHTML = `<span class="question-number">${questionNumber + 1}/${MAX_QUESTIONS}</span> ${tq}`;
 
     if (q.type === "fib") {
-        buildFib(q);
+        buildFib(q, savedUser);
     } else {
-        buildOptions(q);
+        buildOptions(q, savedUser);
     }
 
     nextBtn.textContent = questionNumber >= MAX_QUESTIONS - 1 ? "Finish" : "Next";
@@ -541,12 +524,13 @@ function createQuestion() {
 }
 
 fibSubmit.addEventListener("click", () => {
-    fibInput.classList.toggle("selected", !!fibInput.value.trim());
-    updateFibTick();
-});
-fibInput.addEventListener("input", () => {
-    fibInput.classList.toggle("selected", !!fibInput.value.trim());
-    updateFibTick();
+    if (!fibInput.disabled) {
+        const val = fibInput.value.trim();
+        if (!val) { fibInput.focus(); return; }
+        checkAnswer(val, fibInput);
+        if (isCorrect(active[questionNumber], val)) fibInput.classList.add("correct");
+        else fibInput.classList.add("incorrect");
+    }
 });
 fibInput.addEventListener("keydown", e => {
     if (e.key === "Enter") fibSubmit.click();
@@ -570,13 +554,6 @@ const displayPrevQuestion = () => {
 };
 prevBtn.addEventListener("click", displayPrevQuestion);
 
-const submitQuiz = () => {
-    const miss = MAX_QUESTIONS - answered;
-    if (miss > 0 && !confirm(`You still have ${miss} unanswered question(s). Submit anyway?`)) return;
-    displayQuizResult();
-};
-submitBtn.addEventListener("click", submitQuiz);
-
 const getResultMessage = () => {
     const pct = score / MAX_QUESTIONS;
     if (pct === 1) return "Outstanding! Perfect score.";
@@ -593,11 +570,6 @@ const displayQuizResult = () => {
     resultContainer.innerHTML = "";
 
     const heading = document.createElement("h2");
-    let totalScore = 0;
-    for (let i = 0; i < MAX_QUESTIONS; i++) {
-        if (isCorrect(active[i], localStorage.getItem(`userAnswer_${i}`))) totalScore++;
-    }
-    score = totalScore;
     heading.innerHTML = `You have scored ${score} out of ${MAX_QUESTIONS}.`;
     resultContainer.appendChild(heading);
 
@@ -607,27 +579,24 @@ const displayQuizResult = () => {
 
     const legend = document.createElement("div");
     legend.className = "result-legend";
-    legend.innerHTML = '<span><span class="dot g"></span> Correct</span><span><span class="dot r"></span> Wrong</span><span><span class="dot w"></span> Not answered</span>';
+    legend.innerHTML = '<span><span class="dot g"></span> Correct</span><span><span class="dot r"></span> Wrong / Not answered</span>';
     resultContainer.appendChild(legend);
 
     for (let i = 0; i < MAX_QUESTIONS; i++) {
         const q = active[i];
         const userAnswer = localStorage.getItem(`userAnswer_${i}`);
-        const attempted = !!(userAnswer && userAnswer.trim());
-        const ok = attempted && isCorrect(q, userAnswer);
+        const ok = isCorrect(q, userAnswer);
 
         const item = document.createElement("div");
         item.classList.add("question-container");
-        if (ok) item.classList.add("correct-item");
-        else if (attempted) item.classList.add("incorrect-item");
+        item.classList.add(ok ? "correct-item" : "incorrect-item");
 
         const showQ = q.t.replace(/^True\/False:\s*/, "");
-        const cls = attempted ? (ok ? "good" : "bad") : "";
-        const userText = attempted ? userAnswer.trim() : "Not answered";
+        const userText = userAnswer && userAnswer.trim() ? userAnswer.trim() : "Not answered";
 
         item.innerHTML = `
             <div class="question"><span class="qno">Q${q.n}</span>${showQ}</div>
-            <div class="user-answer ${cls}">Your answer: ${userText}</div>
+            <div class="user-answer ${ok ? "good" : "bad"}">Your answer: ${userText}</div>
             <div class="correct-answer">Correct answer: ${correctText(q)}</div>`;
 
         resultContainer.appendChild(item);
@@ -645,7 +614,6 @@ const displayQuizResult = () => {
 const retakeQuiz = () => {
     questionNumber = 0;
     score = 0;
-    answered = 0;
     active = shuffleArray(active);
     resetLocalStorage();
 
