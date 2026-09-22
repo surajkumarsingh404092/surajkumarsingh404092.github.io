@@ -3,631 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CSE111 Unit 1 — Interactive Quiz</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: "Roboto", -apple-system, "Segoe UI", Arial, sans-serif;
-            margin: 0;
-            background: #f2f6fb;
-            color: #111;
-        }
-
-        .quiz-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px 16px 40px;
-        }
-
-        .quiz-container h1 {
-            text-align: center;
-            font-size: 26px;
-            letter-spacing: -0.4px;
-            margin: 10px 0 20px;
-        }
-
-        .quiz-container .timer {
-            font-weight: bold;
-            text-align: right;
-            font-size: 18px;
-            margin-bottom: 16px;
-        }
-
-        .timer.danger {
-            color: red;
-        }
-
-        .quiz-container h2.question {
-            font-size: 20px;
-            background-color: #d0ecff;
-            padding: 18px;
-            border-radius: 8px;
-            font-weight: normal;
-            line-height: 1.6;
-            margin: 0 0 20px;
-        }
-
-        .question-number {
-            font-size: 15px;
-            margin-right: 12px;
-            background: #1d3557;
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 8px;
-            white-space: nowrap;
-            vertical-align: middle;
-        }
-
-        .quiz-container .options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .quiz-container .option {
-            border: none;
-            padding: 22px 24px;
-            font-size: 17px;
-            background: yellow;
-            cursor: pointer;
-            border-radius: 6px;
-            text-align: left;
-            line-height: 1.4;
-            color: #222;
-            transition: filter .12s;
-        }
-
-        .quiz-container .option:hover:not(.disabled) {
-            filter: brightness(0.95);
-        }
-
-        .disabled {
-            pointer-events: none;
-            opacity: 0.75;
-        }
-
-        .option.correct {
-            background-color: #51e351;
-            color: #222;
-        }
-
-        .option.incorrect {
-            background: #e63946;
-            color: #fff;
-        }
-
-        .fib-row {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 24px;
-            max-width: 720px;
-        }
-
-        .fib-row input {
-            flex: 1;
-            border: none;
-            padding: 20px 22px;
-            font-size: 17px;
-            background: yellow;
-            border-radius: 6px;
-            outline: none;
-            font-family: inherit;
-            color: #222;
-        }
-
-        .fib-row input:focus {
-            outline: 3px solid #ffd700;
-        }
-
-        .fib-row input.correct {
-            background: #51e351;
-        }
-
-        .fib-row input.incorrect {
-            background: #e63946;
-            color: #fff;
-        }
-
-        .fib-row .fib-submit {
-            background: #222;
-            color: #fff;
-            border: none;
-            padding: 12px 26px;
-            font-size: 16px;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 2px;
-            cursor: pointer;
-            border-radius: 6px;
-        }
-
-        .quiz-container .next-btn,
-        .quiz-result .retake-btn {
-            background: #222;
-            color: #fff;
-            border: none;
-            padding: 12px 32px;
-            font-size: 20px;
-            text-transform: uppercase;
-            font-weight: bold;
-            letter-spacing: 3px;
-            cursor: pointer;
-            width: fit-content;
-            display: inline-block;
-        }
-
-        .quiz-container .next-btn {
-            margin: 0 auto;
-            display: block;
-        }
-
-        .nav-row {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
-            max-width: 760px;
-            margin: 0 auto;
-        }
-
-        .nav-row .next-btn {
-            flex: 1;
-            max-width: 300px;
-            width: auto;
-        }
-
-        .next-btn.prev {
-            background: #3a4a5a;
-        }
-
-        .next-btn.prev:disabled {
-            opacity: 0.35;
-            cursor: not-allowed;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* ---------- result page ---------- */
-        .quiz-result {
-            display: none;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px 16px 40px;
-            text-align: center;
-            color: #dd2e00;
-        }
-
-        .quiz-result h2 {
-            margin: 6px 0 0;
-            font-size: 26px;
-        }
-
-        .quiz-result h3 {
-            margin: 0;
-            color: #1d3557;
-            font-size: 20px;
-        }
-
-        .result-legend {
-            font-size: 14px;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            gap: 22px;
-            align-items: center;
-        }
-
-        .result-legend span {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 4px;
-            display: inline-block;
-        }
-
-        .dot.g { background: #51e351; }
-        .dot.r { background: #e63946; }
-
-        .question-container {
-            text-align: left;
-            border: 1.5px solid #dddddd;
-            border-radius: 10px;
-            padding: 14px 18px;
-            font-size: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            background: #fff;
-            color: #222;
-        }
-
-        .question-container.correct-item {
-            background: #2ecc40;
-            border: none;
-            color: #fff;
-        }
-
-        .question-container.incorrect-item {
-            background: #e63946;
-            border: none;
-            color: #fff;
-        }
-
-        .question-container .question {
-            font-weight: 600;
-            line-height: 1.5;
-        }
-
-        .question-container .qno {
-            background: #1d3557;
-            color: #fff;
-            padding: 3px 9px;
-            border-radius: 7px;
-            font-size: 13px;
-            margin-right: 8px;
-        }
-
-        .question-container .user-answer,
-        .question-container .correct-answer {
-            color: #fff;
-            font-size: 14px;
-        }
-
-        .user-answer.good {
-            color: #fff;
-            font-weight: 700;
-        }
-
-        .user-answer.bad {
-            color: #fff;
-            font-weight: 700;
-        }
-
-        .correct-answer {
-            color: #fff;
-            font-weight: 700;
-            font-size: 14px;
-        }
-
-        .quiz-result .retake-btn {
-            margin: 10px auto;
-        }
-
-        footer {
-            text-align: center;
-            color: #7c8a99;
-            font-size: 12px;
-            padding-bottom: 20px;
-        }
-
-        @media (max-width: 700px) {
-            .quiz-container .options {
-                grid-template-columns: 1fr;
-            }
-            .fib-row {
-                flex-direction: column;
-            }
-        }
-    </style>
+    <title>Document</title>
+    <link rel="stylesheet" href="my.css">
 </head>
 <body>
-
-<div class="quiz-container">
-    <h1>CSE111 · Unit 1: Computing Environment</h1>
-    <div class="timer">Time Left: 00:00</div>
-    <h2 class="question"></h2>
-    <div class="options"></div>
-    <div class="fib-row hidden" id="fibRow">
-        <input type="text" id="fibInput" placeholder="Type your answer here…" autocomplete="off">
-        <button class="fib-submit" id="fibSubmit">Check</button>
+    <div class="quiz-container">
+     <h1>General knowledge Quiz</h1>
+     <div class="timer">Time left: 20 seconds</div>
+     <h2 class="question"></h2>
+    <div class="options">
+     
     </div>
-    <div class="nav-row">
-        <button class="next-btn prev" id="prevBtn">Previous</button>
-        <button class="next-btn" id="nextBtn">Next</button>
-    </div>
+    <button class="next-btn">Next</button>
 </div>
 
-<div class="quiz-result"></div>
+<div class="quiz-result">
+   <h2>You have scored 4 out of 5.</h2>
+   <div class="question-container incorrect">
+   <div class="question">Who wrote the novel 'pride and Prejudice'?</div>
+   <div class="user-answer">Your answerer: Not answered</div>
+   <div class="correct-answer"></div>
+</div>Correct answer:correct answer
 
-<footer>CSE111 · Unit 1: Computing Environment — 400-question interactive bank</footer>
 
-<script>
-const QUESTIONS = [{"n":1,"t":"The entity that acts as an intermediary bridge between the user and raw computer hardware is the:","type":"mc","opts":[{"l":"A","t":"Compiler"},{"l":"B","t":"Operating System"},{"l":"C","t":"Linker"},{"l":"D","t":"Assembler"}],"ans":"B","anst":"Operating System"},{"n":2,"t":"In the air-traffic controller analogy, what represents the planes waiting for runway clearance?","type":"mc","opts":[{"l":"A","t":"Data packets"},{"l":"B","t":"Operating systems"},{"l":"C","t":"Applications and hardware components"},{"l":"D","t":"Cloud hypervisors"}],"ans":"C","anst":"Applications and hardware components"},{"n":3,"t":"What would occur if an application attempted to run without an operating system?","type":"mc","opts":[{"l":"A","t":"It would execute faster via native BIOS"},{"l":"B","t":"It would need to speak directly to hardware without shared screens or file systems"},{"l":"C","t":"Multitasking would be handled by CPU microcode"},{"l":"D","t":"The system defaults to an automatic shell"}],"ans":"B","anst":"It would need to speak directly to hardware without shared screens or file systems"},{"n":4,"t":"Managing CPU time allocation among competing processes is the core job of:","type":"mc","opts":[{"l":"A","t":"Process Management"},{"l":"B","t":"Device Management"},{"l":"C","t":"Memory Management"},{"l":"D","t":"Network Access"}],"ans":"A","anst":"Process Management"},{"n":5,"t":"Which subsystem prevents two separate programs from colliding or overwriting each other in RAM?","type":"mc","opts":[{"l":"A","t":"File Management"},{"l":"B","t":"Memory Management"},{"l":"C","t":"Process Scheduling"},{"l":"D","t":"User Isolation"}],"ans":"B","anst":"Memory Management"},{"n":6,"t":"What allows an OS to communicate with peripherals like printers, displays, and keyboards?","type":"mc","opts":[{"l":"A","t":"Hypervisors"},{"l":"B","t":"Compilers"},{"l":"C","t":"Device Drivers"},{"l":"D","t":"Sockets"}],"ans":"C","anst":"Device Drivers"},{"n":7,"t":"Organizing binary storage blocks into files and directory trees is handled by:","type":"mc","opts":[{"l":"A","t":"Security Management"},{"l":"B","t":"File Management"},{"l":"C","t":"Network Management"},{"l":"D","t":"Process Management"}],"ans":"B","anst":"File Management"},{"n":8,"t":"Which function enforces authentication, credentials, and user privilege isolation?","type":"mc","opts":[{"l":"A","t":"Security & Access Control"},{"l":"B","t":"Process Management"},{"l":"C","t":"UI Layer"},{"l":"D","t":"BIOS"}],"ans":"A","anst":"Security & Access Control"},{"n":9,"t":"What are the two primary types of User Interfaces provided by modern operating systems?","type":"mc","opts":[{"l":"A","t":"API and ABI"},{"l":"B","t":"GUI and Command Line"},{"l":"C","t":"TCP and UDP"},{"l":"D","t":"POSIX and ANSI"}],"ans":"B","anst":"GUI and Command Line"},{"n":10,"t":"When an app icon is clicked, what does the OS do first?","type":"mc","opts":[{"l":"A","t":"Allocates RAM"},{"l":"B","t":"Locates the program file on disk"},{"l":"C","t":"Draws the GUI window"},{"l":"D","t":"Assigns CPU priority"}],"ans":"B","anst":"Locates the program file on disk"},{"n":11,"t":"What step occurs directly after the memory manager allocates RAM during application launch?","type":"mc","opts":[{"l":"A","t":"Process manager schedules it on the CPU"},{"l":"B","t":"OS searches disk storage"},{"l":"C","t":"User authentication is verified"},{"l":"D","t":"Display driver initializes GPU memory"}],"ans":"A","anst":"Process manager schedules it on the CPU"},{"n":12,"t":"In which OS architecture are jobs batched and executed sequentially without interactive user control?","type":"mc","opts":[{"l":"A","t":"Time-Sharing OS"},{"l":"B","t":"Batch OS"},{"l":"C","t":"Distributed OS"},{"l":"D","t":"Real-Time OS"}],"ans":"B","anst":"Batch OS"},{"n":13,"t":"Which of the following is an example of a Batch Operating System?","type":"mc","opts":[{"l":"A","t":"FreeRTOS"},{"l":"B","t":"IBM OS/360 / z/OS"},{"l":"C","t":"Ubuntu Desktop"},{"l":"D","t":"Android"}],"ans":"B","anst":"IBM OS/360 / z/OS"},{"n":14,"t":"What primary mechanism allows a Time-Sharing OS to support multiple users simultaneously?","type":"mc","opts":[{"l":"A","t":"Running code without memory allocation"},{"l":"B","t":"Rapid CPU switching between tasks"},{"l":"C","t":"Manual queue management"},{"l":"D","t":"Dedicated hardware threads per user"}],"ans":"B","anst":"Rapid CPU switching between tasks"},{"n":15,"t":"UNIX, Linux, and Multics are classic examples of which OS category?","type":"mc","opts":[{"l":"A","t":"Batch OS"},{"l":"B","t":"Time-Sharing OS"},{"l":"C","t":"Single-User DOS"},{"l":"D","t":"Hard Real-Time OS"}],"ans":"B","anst":"Time-Sharing OS"},{"n":16,"t":"Which OS makes a network of distinct computers appear to the end-user as a single unified machine?","type":"mc","opts":[{"l":"A","t":"Distributed OS"},{"l":"B","t":"Mobile OS"},{"l":"C","t":"Time-Sharing OS"},{"l":"D","t":"RTOS"}],"ans":"A","anst":"Distributed OS"},{"n":17,"t":"Plan 9 from Bell Labs, Amoeba, and Google Fuchsia are examples of:","type":"mc","opts":[{"l":"A","t":"Batch systems"},{"l":"B","t":"Distributed operating systems"},{"l":"C","t":"Embedded microcontroller monitors"},{"l":"D","t":"Virtual machine managers"}],"ans":"B","anst":"Distributed operating systems"},{"n":18,"t":"What is the fundamental design constraint of a Real-Time Operating System (RTOS)?","type":"mc","opts":[{"l":"A","t":"Guaranteed execution within strict time limits"},{"l":"B","t":"Maximum graphic frame rates"},{"l":"C","t":"Battery optimization for smartphones"},{"l":"D","t":"Unlimited memory allocation"}],"ans":"A","anst":"Guaranteed execution within strict time limits"},{"n":19,"t":"Which critical device requires an RTOS?","type":"mc","opts":[{"l":"A","t":"Web server"},{"l":"B","t":"Car airbag controller / Pacemaker"},{"l":"C","t":"Video streaming server"},{"l":"D","t":"Laptop word processor"}],"ans":"B","anst":"Car airbag controller / Pacemaker"},{"n":20,"t":"FreeRTOS, VxWorks, and QNX are classified as:","type":"mc","opts":[{"l":"A","t":"Distributed Operating Systems"},{"l":"B","t":"Real-Time Operating Systems"},{"l":"C","t":"Batch Processing Systems"},{"l":"D","t":"Desktop Operating Systems"}],"ans":"B","anst":"Real-Time Operating Systems"},{"n":21,"t":"Mobile operating systems like Android and iOS are specifically optimized for:","type":"mc","opts":[{"l":"A","t":"Batch card reading"},{"l":"B","t":"Touch, battery life, and app ecosystems"},{"l":"C","t":"Distributed clustering"},{"l":"D","t":"Deterministic industrial robotics"}],"ans":"B","anst":"Touch, battery life, and app ecosystems"},{"n":22,"t":"Over 96% of the world's top 1 million web servers run on:","type":"mc","opts":[{"l":"A","t":"Windows Server"},{"l":"B","t":"Linux"},{"l":"C","t":"macOS"},{"l":"D","t":"Solaris"}],"ans":"B","anst":"Linux"},{"n":23,"t":"The entire Linux file system branches from a single root denoted by:","type":"mc","opts":[{"l":"A","t":"C:\\"},{"l":"B","t":"/"},{"l":"C","t":"/root"},{"l":"D","t":"~"}],"ans":"B","anst":"/"},{"n":24,"t":"Which Linux directory contains essential command binaries like ls and cp?","type":"mc","opts":[{"l":"A","t":"/bin"},{"l":"B","t":"/etc"},{"l":"C","t":"/home"},{"l":"D","t":"/var"}],"ans":"A","anst":"/bin"},{"n":25,"t":"In Linux, machine-wide configuration files are stored inside:","type":"mc","opts":[{"l":"A","t":"/sys"},{"l":"B","t":"/etc"},{"l":"C","t":"/usr"},{"l":"D","t":"/opt"}],"ans":"B","anst":"/etc"},{"n":26,"t":"Where are personal folders and profiles for regular non-root users stored by default?","type":"mc","opts":[{"l":"A","t":"/root"},{"l":"B","t":"/home"},{"l":"C","t":"/var/users"},{"l":"D","t":"/usr/home"}],"ans":"B","anst":"/home"},{"n":27,"t":"Variable system runtime files such as log output and caches are stored in:","type":"mc","opts":[{"l":"A","t":"/tmp"},{"l":"B","t":"/var"},{"l":"C","t":"/bin"},{"l":"D","t":"/dev"}],"ans":"B","anst":"/var"},{"n":28,"t":"The dedicated home directory for the administrator (superuser) is:","type":"mc","opts":[{"l":"A","t":"/home/root"},{"l":"B","t":"/root"},{"l":"C","t":"/"},{"l":"D","t":"/admin"}],"ans":"B","anst":"/root"},{"n":29,"t":"Installed software programs and libraries are located within:","type":"mc","opts":[{"l":"A","t":"/usr"},{"l":"B","t":"/etc"},{"l":"C","t":"/var"},{"l":"D","t":"/bin"}],"ans":"A","anst":"/usr"},{"n":30,"t":"Which command shows the folder you are currently in?","type":"mc","opts":[{"l":"A","t":"ls"},{"l":"B","t":"pwd"},{"l":"C","t":"cd"},{"l":"D","t":"dir"}],"ans":"B","anst":"pwd"},{"n":31,"t":"To see a listing of files and folders inside your current directory, run:","type":"mc","opts":[{"l":"A","t":"ls"},{"l":"B","t":"cat"},{"l":"C","t":"pwd"},{"l":"D","t":"touch"}],"ans":"A","anst":"ls"},{"n":32,"t":"What command changes your current folder in the terminal?","type":"mc","opts":[{"l":"A","t":"mv"},{"l":"B","t":"cd"},{"l":"C","t":"pwd"},{"l":"D","t":"ls"}],"ans":"B","anst":"cd"},{"n":33,"t":"Which command creates a new folder in Linux?","type":"mc","opts":[{"l":"A","t":"touch"},{"l":"B","t":"mkdir"},{"l":"C","t":"rmdir"},{"l":"D","t":"cat"}],"ans":"B","anst":"mkdir"},{"n":34,"t":"The command rmdir deletes:","type":"mc","opts":[{"l":"A","t":"Any directory recursively"},{"l":"B","t":"An empty folder"},{"l":"C","t":"Individual hidden files"},{"l":"D","t":"Corrupted partitions"}],"ans":"B","anst":"An empty folder"},{"n":35,"t":"To create a blank new file named script.py, type:","type":"mc","opts":[{"l":"A","t":"touch script.py"},{"l":"B","t":"mkdir script.py"},{"l":"C","t":"cat script.py"},{"l":"D","t":"chmod script.py"}],"ans":"A","anst":"touch script.py"},{"n":36,"t":"Which command copies files or folders from one location to another?","type":"mc","opts":[{"l":"A","t":"mv"},{"l":"B","t":"cp"},{"l":"C","t":"touch"},{"l":"D","t":"rm"}],"ans":"B","anst":"cp"},{"n":37,"t":"The mv command is used to:","type":"mc","opts":[{"l":"A","t":"Move or rename a file"},{"l":"B","t":"Clone partitions"},{"l":"C","t":"Modify timestamps"},{"l":"D","t":"Concatenate outputs"}],"ans":"A","anst":"Move or rename a file"},{"n":38,"t":"Which command deletes a file?","type":"mc","opts":[{"l":"A","t":"rm"},{"l":"B","t":"rmdir"},{"l":"C","t":"deldir"},{"l":"D","t":"erase"}],"ans":"A","anst":"rm"},{"n":39,"t":"To display a file's contents directly to the console, execute:","type":"mc","opts":[{"l":"A","t":"view"},{"l":"B","t":"cat"},{"l":"C","t":"echo"},{"l":"D","t":"show"}],"ans":"B","anst":"cat"},{"n":40,"t":"Which command changes file permissions in Linux?","type":"mc","opts":[{"l":"A","t":"chown"},{"l":"B","t":"chmod"},{"l":"C","t":"touch"},{"l":"D","t":"cp"}],"ans":"B","anst":"chmod"},{"n":41,"t":"What does the command chmod +x app.py accomplish?","type":"mc","opts":[{"l":"A","t":"Deletes app.py"},{"l":"B","t":"Grants execute permission to app.py"},{"l":"C","t":"Opens app.py in edit mode"},{"l":"D","t":"Marks app.py as hidden"}],"ans":"B","anst":"Grants execute permission to app.py"},{"n":42,"t":"Two or more interconnected computers configured to exchange data and share resources constitute a:","type":"mc","opts":[{"l":"A","t":"File system"},{"l":"B","t":"Computer Network"},{"l":"C","t":"Hypervisor"},{"l":"D","t":"Database"}],"ans":"B","anst":"Computer Network"},{"n":43,"t":"Which network class covers personal devices within a span of a few meters?","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"PAN"},{"l":"C","t":"MAN"},{"l":"D","t":"WAN"}],"ans":"B","anst":"PAN"},{"n":44,"t":"Connecting wireless earbuds to a smartphone via Bluetooth forms a:","type":"mc","opts":[{"l":"A","t":"MAN"},{"l":"B","t":"PAN"},{"l":"C","t":"WAN"},{"l":"D","t":"LAN"}],"ans":"B","anst":"PAN"},{"n":45,"t":"A network contained within a single building or college computer lab is a:","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"WAN"},{"l":"C","t":"PAN"},{"l":"D","t":"MAN"}],"ans":"A","anst":"LAN"},{"n":46,"t":"A network covering an entire city (such as a cable TV or traffic-camera network) is a:","type":"mc","opts":[{"l":"A","t":"PAN"},{"l":"B","t":"MAN"},{"l":"C","t":"LAN"},{"l":"D","t":"WAN"}],"ans":"B","anst":"MAN"},{"n":47,"t":"The largest Wide Area Network (WAN) in existence is:","type":"mc","opts":[{"l":"A","t":"The Internet itself"},{"l":"B","t":"Bell Labs network"},{"l":"C","t":"An AWS Availability Zone"},{"l":"D","t":"An Ethernet subnet"}],"ans":"A","anst":"The Internet itself"},{"n":48,"t":"Which topology connects every node to one central hub or switch?","type":"mc","opts":[{"l":"A","t":"Bus"},{"l":"B","t":"Star"},{"l":"C","t":"Ring"},{"l":"D","t":"Mesh"}],"ans":"B","anst":"Star"},{"n":49,"t":"Which network topology connects all stations along a single shared central cable?","type":"mc","opts":[{"l":"A","t":"Star"},{"l":"B","t":"Bus"},{"l":"C","t":"Mesh"},{"l":"D","t":"Ring"}],"ans":"B","anst":"Bus"},{"n":50,"t":"In which topology is each network node wired to exactly two neighbors?","type":"mc","opts":[{"l":"A","t":"Bus"},{"l":"B","t":"Ring"},{"l":"C","t":"Star"},{"l":"D","t":"Tree"}],"ans":"B","anst":"Ring"},{"n":51,"t":"What topology connects all devices to all others directly?","type":"mc","opts":[{"l":"A","t":"Star"},{"l":"B","t":"Mesh"},{"l":"C","t":"Bus"},{"l":"D","t":"Ring"}],"ans":"B","anst":"Mesh"},{"n":52,"t":"When entering a website URL into a browser, which protocol translates it to an IP address?","type":"mc","opts":[{"l":"A","t":"HTTP"},{"l":"B","t":"DNS"},{"l":"C","t":"DHCP"},{"l":"D","t":"ARP"}],"ans":"B","anst":"DNS"},{"n":53,"t":"What role does a server play in Client-Server architecture?","type":"mc","opts":[{"l":"A","t":"Initiates requests"},{"l":"B","t":"Receives requests, executes logic, and transmits processed responses"},{"l":"C","t":"Replaces the router"},{"l":"D","t":"Generates user display windows"}],"ans":"B","anst":"Receives requests, executes logic, and transmits processed responses"},{"n":54,"t":"Which intelligent networking device directs traffic between different networks?","type":"mc","opts":[{"l":"A","t":"Switch"},{"l":"B","t":"Router"},{"l":"C","t":"Hub"},{"l":"D","t":"Repeater"}],"ans":"B","anst":"Router"},{"n":55,"t":"Why is a network switch superior to a traditional network hub?","type":"mc","opts":[{"l":"A","t":"It sends data only where needed instead of broadcasting to every device"},{"l":"B","t":"It needs no electricity"},{"l":"C","t":"It only works wirelessly"},{"l":"D","t":"It bypasses IP addresses"}],"ans":"A","anst":"It sends data only where needed instead of broadcasting to every device"},{"n":56,"t":"What legacy hardware device connects devices by broadcasting incoming signals to all of them?","type":"mc","opts":[{"l":"A","t":"Router"},{"l":"B","t":"Hub"},{"l":"C","t":"Switch"},{"l":"D","t":"Gateway"}],"ans":"B","anst":"Hub"},{"n":57,"t":"Which device converts signals between your ISP and your home network?","type":"mc","opts":[{"l":"A","t":"Modem"},{"l":"B","t":"NIC"},{"l":"C","t":"Access Point"},{"l":"D","t":"Transceiver"}],"ans":"A","anst":"Modem"},{"n":58,"t":"What hardware inside a computer provides physical connectivity to a network?","type":"mc","opts":[{"l":"A","t":"Modem"},{"l":"B","t":"Network Interface Card (NIC)"},{"l":"C","t":"Hypervisor"},{"l":"D","t":"ROM"}],"ans":"B","anst":"Network Interface Card (NIC)"},{"n":59,"t":"How many layers exist in the theoretical OSI reference model?","type":"mc","opts":[{"l":"A","t":"4"},{"l":"B","t":"7"},{"l":"C","t":"5"},{"l":"D","t":"6"}],"ans":"B","anst":"7"},{"n":60,"t":"Which layer is Layer 1 of the OSI Model?","type":"mc","opts":[{"l":"A","t":"Data Link"},{"l":"B","t":"Physical"},{"l":"C","t":"Network"},{"l":"D","t":"Application"}],"ans":"B","anst":"Physical"},{"n":61,"t":"What OSI layer handles end-to-end data delivery and error recovery?","type":"mc","opts":[{"l":"A","t":"Session Layer"},{"l":"B","t":"Transport Layer"},{"l":"C","t":"Network Layer"},{"l":"D","t":"Presentation Layer"}],"ans":"B","anst":"Transport Layer"},{"n":62,"t":"How many layers make up the practical TCP/IP Internet suite?","type":"mc","opts":[{"l":"A","t":"4"},{"l":"B","t":"7"},{"l":"C","t":"3"},{"l":"D","t":"5"}],"ans":"A","anst":"4"},{"n":63,"t":"Which layer in the TCP/IP model determines the best path and handles packet routing?","type":"mc","opts":[{"l":"A","t":"Application"},{"l":"B","t":"Transport"},{"l":"C","t":"Internet"},{"l":"D","t":"Network Access"}],"ans":"C","anst":"Internet"},{"n":64,"t":"Software that creates, runs, and manages virtual machines by sharing physical hardware is a:","type":"mc","opts":[{"l":"A","t":"Compiler"},{"l":"B","t":"Hypervisor"},{"l":"C","t":"Container engine"},{"l":"D","t":"Microkernel"}],"ans":"B","anst":"Hypervisor"},{"n":65,"t":"Consolidating 10 separate physical servers into 1 powerful server running 10 VMs is called:","type":"mc","opts":[{"l":"A","t":"Server Consolidation"},{"l":"B","t":"Elastic Clustering"},{"l":"C","t":"Overclocking"},{"l":"D","t":"Rapid Paging"}],"ans":"A","anst":"Server Consolidation"},{"n":66,"t":"Oracle VirtualBox and VMware Player are classified as:","type":"mc","opts":[{"l":"A","t":"Type-1 Bare-Metal Hypervisors"},{"l":"B","t":"Type-2 Hosted Hypervisors"},{"l":"C","t":"Microkernels"},{"l":"D","t":"Hardware ASICs"}],"ans":"B","anst":"Type-2 Hosted Hypervisors"},{"n":67,"t":"What VM action saves the VM's exact state to return to later?","type":"mc","opts":[{"l":"A","t":"Clone"},{"l":"B","t":"Snapshot"},{"l":"C","t":"Stop"},{"l":"D","t":"Boot"}],"ans":"B","anst":"Snapshot"},{"n":68,"t":"What disk image file format is attached to boot up and install an OS on a VM?","type":"mc","opts":[{"l":"A","t":".tar"},{"l":"B","t":".iso"},{"l":"C","t":".dll"},{"l":"D","t":".sys"}],"ans":"B","anst":".iso"},{"n":69,"t":"According to the curriculum, Cloud Computing is defined as:","type":"mc","opts":[{"l":"A","t":"Renting computing power, storage, and software over the Internet"},{"l":"B","t":"Local external hard drive backups"},{"l":"C","t":"Upgrading CPU hardware"},{"l":"D","t":"Ad-hoc Bluetooth networking"}],"ans":"A","anst":"Renting computing power, storage, and software over the Internet"},{"n":70,"t":"Which cloud deployment model is dedicated to one organization only (e.g., an internal bank cloud)?","type":"mc","opts":[{"l":"A","t":"Public Cloud"},{"l":"B","t":"Private Cloud"},{"l":"C","t":"Hybrid Cloud"},{"l":"D","t":"Community Cloud"}],"ans":"B","anst":"Private Cloud"},{"n":71,"t":"An independent software-based computer that behaves like a physical machine is a:","type":"fib","ans":"","anst":"Virtual Machine (VM)"},{"n":72,"t":"In Linux, running cd .. navigates to the:","type":"fib","ans":"","anst":"Parent directory"},{"n":73,"t":"The theoretical OSI model contains ___ layers, while the practical TCP/IP suite contains ___ layers.","type":"fib","ans":"","anst":"7; 4"},{"n":74,"t":"Essential user command binaries are kept in /bin, while system-wide configurations are kept in:","type":"fib","ans":"","anst":"/etc"},{"n":75,"t":"An OS that guarantees a response within a strict time limit is an:","type":"fib","ans":"","anst":"RTOS (Real-Time Operating System)"},{"n":76,"t":"Amazon Web Services (AWS) was launched first in the year:","type":"fib","ans":"","anst":"2006"},{"n":77,"t":"The hardware device that bridges and translates signals from your ISP into your network is a:","type":"fib","ans":"","anst":"Modem"},{"n":78,"t":"The 5 NIST cloud traits are On-Demand Self-Service, Broad Network Access, Resource Pooling, Rapid Elasticity, and:","type":"fib","ans":"","anst":"Measured Service"},{"n":79,"t":"The Linux command to display a file's contents is:","type":"fib","ans":"","anst":"cat"},{"n":80,"t":"In a ___ topology, each device connects to exactly two neighbors in a loop.","type":"fib","ans":"","anst":"Ring"},{"n":81,"t":"In an IaaS model, the provider manages servers and storage, while the customer installs the:","type":"fib","ans":"","anst":"Operating System and Applications"},{"n":82,"t":"The command to change file permissions is:","type":"fib","ans":"","anst":"chmod"},{"n":83,"t":"A cloud deployment combining public and private cloud environments is a:","type":"fib","ans":"","anst":"Hybrid Cloud"},{"n":84,"t":"The hardware inside a device that connects it to a network is the:","type":"fib","ans":"","anst":"NIC (Network Interface Card)"},{"n":85,"t":"The acronym NIST stands for National Institute of:","type":"fib","ans":"","anst":"Standards and Technology"},{"n":86,"t":"True/False: In a star topology, if one workstation cable breaks, the entire network halts.","type":"tf","ans":"False","anst":"False"},{"n":87,"t":"True/False: Rapid Elasticity means cloud resources automatically scale when demand surges and scale down when demand drops.","type":"tf","ans":"True","anst":"True"},{"n":88,"t":"True/False: The personal files of regular non-root users reside directly in /root.","type":"tf","ans":"False","anst":"False"},{"n":89,"t":"True/False: A network hub is smart and forwards data only where needed.","type":"tf","ans":"False","anst":"False"},{"n":90,"t":"True/False: Taking a virtual machine snapshot allows you to restore the VM state without affecting your main host computer.","type":"tf","ans":"True","anst":"True"},{"n":91,"t":"True/False: In Platform as a Service (PaaS), the customer must configure the physical server hardware.","type":"tf","ans":"False","anst":"False"},{"n":92,"t":"True/False: Netflix on AWS streams content to over 300M+ users globally.","type":"tf","ans":"True","anst":"True"},{"n":93,"t":"True/False: Time-sharing operating systems rapidly switch the CPU between multiple users' tasks.","type":"tf","ans":"True","anst":"True"},{"n":94,"t":"True/False: The rmdir command deletes non-empty directories filled with active files.","type":"tf","ans":"False","anst":"False"},{"n":95,"t":"True/False: Presentation Layer (Layer 6) in the OSI model handles data formatting, compression, and encryption.","type":"tf","ans":"True","anst":"True"},{"n":96,"t":"True/False: Routers direct traffic between different networks.","type":"tf","ans":"True","anst":"True"},{"n":97,"t":"True/False: Type-2 hypervisors run directly on bare metal without requiring an existing host operating system.","type":"tf","ans":"False","anst":"False"},{"n":98,"t":"True/False: Resource pooling allows cloud providers to serve multiple customers by sharing physical resources.","type":"tf","ans":"True","anst":"True"},{"n":99,"t":"True/False: Everything in Linux lives in one unified hierarchy tree starting at root (/).","type":"tf","ans":"True","anst":"True"},{"n":100,"t":"True/False: Under Software as a Service (SaaS), the provider manages everything, and you simply use the finished app.","type":"tf","ans":"True","anst":"True"},{"n":101,"t":"What primary role does the OS kernel fulfill during memory management?","type":"mc","opts":[{"l":"A","t":"Compiles source code"},{"l":"B","t":"Allocates and frees RAM so processes don't collide"},{"l":"C","t":"Modulates radio frequencies"},{"l":"D","t":"Resolves DNS domain queries"}],"ans":"B","anst":"Allocates and frees RAM so processes don't collide"},{"n":102,"t":"In the air-traffic controller analogy, what represents the physical runways?","type":"mc","opts":[{"l":"A","t":"Cloud data centers"},{"l":"B","t":"Physical hardware resources (CPU, RAM, storage, screen)"},{"l":"C","t":"Web browser tabs"},{"l":"D","t":"Network cables"}],"ans":"B","anst":"Physical hardware resources (CPU, RAM, storage, screen)"},{"n":103,"t":"Which operating system type processes collected batches of jobs without real-time human interaction?","type":"mc","opts":[{"l":"A","t":"Mobile OS"},{"l":"B","t":"Batch OS"},{"l":"C","t":"Distributed OS"},{"l":"D","t":"Time-Sharing OS"}],"ans":"B","anst":"Batch OS"},{"n":104,"t":"Which real-world process was historically automated by early Batch OS platforms?","type":"mc","opts":[{"l":"A","t":"Real-time GPS navigation"},{"l":"B","t":"Early bank cheque processing systems"},{"l":"C","t":"Smartphone gaming"},{"l":"D","t":"Autonomous driving"}],"ans":"B","anst":"Early bank cheque processing systems"},{"n":105,"t":"How does a Time-Sharing OS manage interactive responsiveness across multiple users?","type":"mc","opts":[{"l":"A","t":"Assigns dedicated CPUs to every person"},{"l":"B","t":"Rapidly switches the CPU between multiple users' tasks"},{"l":"C","t":"Queues jobs overnight"},{"l":"D","t":"Omits security permissions"}],"ans":"B","anst":"Rapidly switches the CPU between multiple users' tasks"},{"n":106,"t":"In an industrial robot assembly line, which OS category is non-negotiable?","type":"mc","opts":[{"l":"A","t":"Batch OS"},{"l":"B","t":"Real-Time OS (RTOS)"},{"l":"C","t":"Desktop OS"},{"l":"D","t":"Mobile OS"}],"ans":"B","anst":"Real-Time OS (RTOS)"},{"n":107,"t":"Modern mobile operating systems (Android, iOS) prioritize:","type":"mc","opts":[{"l":"A","t":"Touch, battery life, and sandboxed app ecosystems"},{"l":"B","t":"Card punched tape readers"},{"l":"C","t":"Raw mainframe job queues"},{"l":"D","t":"Disabling the GUI"}],"ans":"A","anst":"Touch, battery life, and sandboxed app ecosystems"},{"n":108,"t":"Why does Linux matter for a Computer Science student?","type":"mc","opts":[{"l":"A","t":"It runs only on microcontrollers"},{"l":"B","t":"It powers most of the internet, is open-source, and CLI skills transfer directly to real jobs"},{"l":"C","t":"It does not require memory"},{"l":"D","t":"It has no terminal"}],"ans":"B","anst":"It powers most of the internet, is open-source, and CLI skills transfer directly to real jobs"},{"n":109,"t":"What proportion of the world's top 1 million web servers run on Linux?","type":"mc","opts":[{"l":"A","t":"Less than 20%"},{"l":"B","t":"Around 50%"},{"l":"C","t":"Over 96%"},{"l":"D","t":"Exactly 10%"}],"ans":"C","anst":"Over 96%"},{"n":110,"t":"In Linux, all files and folders branch from which single symbol?","type":"mc","opts":[{"l":"A","t":"\\"},{"l":"B","t":"/"},{"l":"C","t":"~"},{"l":"D","t":"$"}],"ans":"B","anst":"/"},{"n":111,"t":"Essential user command binaries like cat and ls are located in:","type":"mc","opts":[{"l":"A","t":"/etc"},{"l":"B","t":"/bin"},{"l":"C","t":"/var"},{"l":"D","t":"/home"}],"ans":"B","anst":"/bin"},{"n":112,"t":"Where are log outputs, cache files, and spoolers preserved in Linux?","type":"mc","opts":[{"l":"A","t":"/var"},{"l":"B","t":"/home"},{"l":"C","t":"/bin"},{"l":"D","t":"/usr"}],"ans":"A","anst":"/var"},{"n":113,"t":"A regular student user named riya will have their personal files placed in:","type":"mc","opts":[{"l":"A","t":"/root"},{"l":"B","t":"/home/riya"},{"l":"C","t":"/bin/riya"},{"l":"D","t":"/etc/riya"}],"ans":"B","anst":"/home/riya"},{"n":114,"t":"System-wide configuration files in Linux are found in:","type":"mc","opts":[{"l":"A","t":"/var"},{"l":"B","t":"/etc"},{"l":"C","t":"/root"},{"l":"D","t":"/bin"}],"ans":"B","anst":"/etc"},{"n":115,"t":"What command outputs the current folder you are working inside?","type":"mc","opts":[{"l":"A","t":"ls"},{"l":"B","t":"pwd"},{"l":"C","t":"cd"},{"l":"D","t":"touch"}],"ans":"B","anst":"pwd"},{"n":116,"t":"Which command lists all items in the active working directory?","type":"mc","opts":[{"l":"A","t":"pwd"},{"l":"B","t":"ls"},{"l":"C","t":"cat"},{"l":"D","t":"cd"}],"ans":"B","anst":"ls"},{"n":117,"t":"How do you move your terminal session into a subfolder called project?","type":"mc","opts":[{"l":"A","t":"mv project"},{"l":"B","t":"cd project"},{"l":"C","t":"mkdir project"},{"l":"D","t":"touch project"}],"ans":"B","anst":"cd project"},{"n":118,"t":"What command deletes an empty directory named test?","type":"mc","opts":[{"l":"A","t":"rmdir test"},{"l":"B","t":"rm test"},{"l":"C","t":"touch test"},{"l":"D","t":"chmod test"}],"ans":"A","anst":"rmdir test"},{"n":119,"t":"What will the command touch notes.txt do if notes.txt does not exist?","type":"mc","opts":[{"l":"A","t":"Delete the folder"},{"l":"B","t":"Create an empty file named notes.txt"},{"l":"C","t":"Print the file"},{"l":"D","t":"Grant execute permissions"}],"ans":"B","anst":"Create an empty file named notes.txt"},{"n":120,"t":"Which command copies report.txt into a folder named labs?","type":"mc","opts":[{"l":"A","t":"cp report.txt labs/"},{"l":"B","t":"mv report.txt labs/"},{"l":"C","t":"touch report.txt labs/"},{"l":"D","t":"ls labs/ report.txt"}],"ans":"A","anst":"cp report.txt labs/"},{"n":121,"t":"To rename draft.txt to final.txt, execute:","type":"mc","opts":[{"l":"A","t":"cp draft.txt final.txt"},{"l":"B","t":"mv draft.txt final.txt"},{"l":"C","t":"touch draft.txt final.txt"},{"l":"D","t":"rm draft.txt final.txt"}],"ans":"B","anst":"mv draft.txt final.txt"},{"n":122,"t":"Which command displays the content of notes.txt directly to the terminal screen?","type":"mc","opts":[{"l":"A","t":"cat notes.txt"},{"l":"B","t":"ls notes.txt"},{"l":"C","t":"touch notes.txt"},{"l":"D","t":"cd notes.txt"}],"ans":"A","anst":"cat notes.txt"},{"n":123,"t":"To mark a script file named app.py as executable, run:","type":"mc","opts":[{"l":"A","t":"chmod +x app.py"},{"l":"B","t":"touch app.py"},{"l":"C","t":"cat app.py"},{"l":"D","t":"mv app.py +x"}],"ans":"A","anst":"chmod +x app.py"},{"n":124,"t":"What is a computer network?","type":"mc","opts":[{"l":"A","t":"Software that executes Python programs"},{"l":"B","t":"A group of two or more computers linked together to share data, files, and resources"},{"l":"C","t":"A multi-core CPU"},{"l":"D","t":"A virtual machine monitor"}],"ans":"B","anst":"A group of two or more computers linked together to share data, files, and resources"},{"n":125,"t":"A network covering a few meters around an individual user is a:","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"PAN"},{"l":"C","t":"MAN"},{"l":"D","t":"WAN"}],"ans":"B","anst":"PAN"},{"n":126,"t":"A smartwatch exchanging data with a phone is an example of a:","type":"mc","opts":[{"l":"A","t":"MAN"},{"l":"B","t":"PAN"},{"l":"C","t":"WAN"},{"l":"D","t":"LAN"}],"ans":"B","anst":"PAN"},{"n":127,"t":"A college campus or hostel Wi-Fi network is classified as a:","type":"mc","opts":[{"l":"A","t":"PAN"},{"l":"B","t":"LAN"},{"l":"C","t":"MAN"},{"l":"D","t":"WAN"}],"ans":"B","anst":"LAN"},{"n":128,"t":"An interconnected metropolitan network across an entire city is a:","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"MAN"},{"l":"C","t":"PAN"},{"l":"D","t":"WAN"}],"ans":"B","anst":"MAN"},{"n":129,"t":"A video call to someone abroad travels across countries and continents using a:","type":"mc","opts":[{"l":"A","t":"PAN"},{"l":"B","t":"LAN"},{"l":"C","t":"WAN"},{"l":"D","t":"SAN"}],"ans":"C","anst":"WAN"},{"n":130,"t":"What network topology attaches all devices along a single central cable?","type":"mc","opts":[{"l":"A","t":"Star"},{"l":"B","t":"Bus"},{"l":"C","t":"Ring"},{"l":"D","t":"Mesh"}],"ans":"B","anst":"Bus"},{"n":131,"t":"Which topology connects all devices to one central switch or hub?","type":"mc","opts":[{"l":"A","t":"Ring"},{"l":"B","t":"Star"},{"l":"C","t":"Bus"},{"l":"D","t":"Mesh"}],"ans":"B","anst":"Star"},{"n":132,"t":"In a Ring topology, each node connects to exactly:","type":"mc","opts":[{"l":"A","t":"1 device"},{"l":"B","t":"2 neighbors"},{"l":"C","t":"4 devices"},{"l":"D","t":"All nodes"}],"ans":"B","anst":"2 neighbors"},{"n":133,"t":"Which network layout connects devices directly to all others?","type":"mc","opts":[{"l":"A","t":"Mesh"},{"l":"B","t":"Star"},{"l":"C","t":"Bus"},{"l":"D","t":"Ring"}],"ans":"A","anst":"Mesh"},{"n":134,"t":"Which system translates human-readable web addresses into numeric IP addresses?","type":"mc","opts":[{"l":"A","t":"ARP"},{"l":"B","t":"DNS"},{"l":"C","t":"DHCP"},{"l":"D","t":"SMTP"}],"ans":"B","anst":"DNS"},{"n":135,"t":"In Client-Server architecture, what initiates the request?","type":"mc","opts":[{"l":"A","t":"The server"},{"l":"B","t":"The client (e.g., browser)"},{"l":"C","t":"The database"},{"l":"D","t":"The switch"}],"ans":"B","anst":"The client (e.g., browser)"},{"n":136,"t":"Why is a network hub considered \"dumb\"?","type":"mc","opts":[{"l":"A","t":"It cannot handle digital bits"},{"l":"B","t":"It broadcasts incoming data to every single connected device"},{"l":"C","t":"It requires optical fiber"},{"l":"D","t":"It drops half of the packets"}],"ans":"B","anst":"It broadcasts incoming data to every single connected device"},{"n":137,"t":"How does a network switch handle packets smartly?","type":"mc","opts":[{"l":"A","t":"It broadcasts to all ports"},{"l":"B","t":"It sends data only where needed"},{"l":"C","t":"It connects different networks together"},{"l":"D","t":"It modulates telephone signals"}],"ans":"B","anst":"It sends data only where needed"},{"n":138,"t":"Which device directs traffic between different networks?","type":"mc","opts":[{"l":"A","t":"Switch"},{"l":"B","t":"Hub"},{"l":"C","t":"Router"},{"l":"D","t":"Repeater"}],"ans":"C","anst":"Router"},{"n":139,"t":"Which device bridges and converts signals between your ISP and your home network?","type":"mc","opts":[{"l":"A","t":"NIC"},{"l":"B","t":"Modem"},{"l":"C","t":"Access Point"},{"l":"D","t":"Hub"}],"ans":"B","anst":"Modem"},{"n":140,"t":"What is the role of an Access Point?","type":"mc","opts":[{"l":"A","t":"Converts digital signals to analog"},{"l":"B","t":"Lets wireless devices join a wired network"},{"l":"C","t":"Runs virtual machines"},{"l":"D","t":"Compiles code"}],"ans":"B","anst":"Lets wireless devices join a wired network"},{"n":141,"t":"The physical hardware inside a device that connects it to a network is the:","type":"mc","opts":[{"l":"A","t":"Modem"},{"l":"B","t":"Network Interface Card (NIC)"},{"l":"C","t":"Access Point"},{"l":"D","t":"Router"}],"ans":"B","anst":"Network Interface Card (NIC)"},{"n":142,"t":"A standardized set of rules and formats governing data transmission across a network is a:","type":"mc","opts":[{"l":"A","t":"Hypervisor"},{"l":"B","t":"Protocol"},{"l":"C","t":"Kernel"},{"l":"D","t":"Shell"}],"ans":"B","anst":"Protocol"},{"n":143,"t":"In the 7-layer OSI model, which layer handles node-to-node transfer and physical MAC addressing?","type":"mc","opts":[{"l":"A","t":"Physical (Layer 1)"},{"l":"B","t":"Data Link (Layer 2)"},{"l":"C","t":"Network (Layer 3)"},{"l":"D","t":"Transport (Layer 4)"}],"ans":"B","anst":"Data Link (Layer 2)"},{"n":144,"t":"Logical addressing (IP) and routing path determination occur at which OSI layer?","type":"mc","opts":[{"l":"A","t":"Data Link"},{"l":"B","t":"Network (Layer 3)"},{"l":"C","t":"Transport"},{"l":"D","t":"Session"}],"ans":"B","anst":"Network (Layer 3)"},{"n":145,"t":"Which OSI layer handles data formatting, compression, and encryption?","type":"mc","opts":[{"l":"A","t":"Presentation (Layer 6)"},{"l":"B","t":"Transport"},{"l":"C","t":"Application"},{"l":"D","t":"Network"}],"ans":"A","anst":"Presentation (Layer 6)"},{"n":146,"t":"How does the practical TCP/IP suite compare to the theoretical OSI model?","type":"mc","opts":[{"l":"A","t":"It uses 4 layers that drive the real Internet"},{"l":"B","t":"It has 7 layers"},{"l":"C","t":"It omits the Internet layer"},{"l":"D","t":"It only works on Linux"}],"ans":"A","anst":"It uses 4 layers that drive the real Internet"},{"n":147,"t":"Which TCP/IP layer controls hardware devices and physical transmission media?","type":"mc","opts":[{"l":"A","t":"Application"},{"l":"B","t":"Transport"},{"l":"C","t":"Internet"},{"l":"D","t":"Network Access"}],"ans":"D","anst":"Network Access"},{"n":148,"t":"What software creates, runs, and manages virtual machines by sharing physical hardware?","type":"mc","opts":[{"l":"A","t":"Operating System Shell"},{"l":"B","t":"Hypervisor"},{"l":"C","t":"Web Browser"},{"l":"D","t":"Compiler"}],"ans":"B","anst":"Hypervisor"},{"n":149,"t":"What is a Virtual Machine (VM)?","type":"mc","opts":[{"l":"A","t":"A software-based computer that behaves like a physical computer"},{"l":"B","t":"An optical cable"},{"l":"C","t":"A type of volatile RAM"},{"l":"D","t":"A CPU cooling system"}],"ans":"A","anst":"A software-based computer that behaves like a physical computer"},{"n":150,"t":"Merging 10 physical servers into 1 server running 10 VMs to save cost and energy is called:","type":"mc","opts":[{"l":"A","t":"Server Consolidation"},{"l":"B","t":"Rapid Elasticity"},{"l":"C","t":"Measured Service"},{"l":"D","t":"Paging"}],"ans":"A","anst":"Server Consolidation"},{"n":151,"t":"What hypervisor category does Oracle VirtualBox belong to?","type":"mc","opts":[{"l":"A","t":"Type-1 Bare-Metal Hypervisor"},{"l":"B","t":"Type-2 Hosted Hypervisor"},{"l":"C","t":"Cloud Router"},{"l":"D","t":"Firmware microcode"}],"ans":"B","anst":"Type-2 Hosted Hypervisor"},{"n":152,"t":"When setting up a VM, which hardware parameters are allocated from the host?","type":"mc","opts":[{"l":"A","t":"Screen pixels only"},{"l":"B","t":"RAM, CPU cores, and virtual hard disk space"},{"l":"C","t":"External IP addresses only"},{"l":"D","t":"Network cable bandwidth"}],"ans":"B","anst":"RAM, CPU cores, and virtual hard disk space"},{"n":153,"t":"What action should you take before installing experimental software you don't fully trust in a VM?","type":"mc","opts":[{"l":"A","t":"Delete the VM"},{"l":"B","t":"Take a Snapshot"},{"l":"C","t":"Clone the host disk"},{"l":"D","t":"Reinstall the host OS"}],"ans":"B","anst":"Take a Snapshot"},{"n":154,"t":"What is the fundamental difference between cloning a VM and taking a snapshot?","type":"mc","opts":[{"l":"A","t":"A snapshot makes an identical standalone new VM; a clone saves state"},{"l":"B","t":"A clone makes an identical copy of the whole VM; a snapshot saves exact state to return to later"},{"l":"C","t":"A clone deletes the virtual disk"},{"l":"D","t":"A snapshot formats the host OS"}],"ans":"B","anst":"A clone makes an identical copy of the whole VM; a snapshot saves exact state to return to later"},{"n":155,"t":"What file format is mounted to install an OS onto a virtual machine?","type":"mc","opts":[{"l":"A","t":".zip"},{"l":"B","t":".iso"},{"l":"C","t":".exe"},{"l":"D","t":".tar"}],"ans":"B","anst":".iso"},{"n":156,"t":"Cloud computing is described as renting computing power over the Internet, operating:","type":"mc","opts":[{"l":"A","t":"Like a generator you own"},{"l":"B","t":"Like electricity from a power grid where you plug in and pay for what you use"},{"l":"C","t":"Only on mobile phones"},{"l":"D","t":"Without hypervisors"}],"ans":"B","anst":"Like electricity from a power grid where you plug in and pay for what you use"},{"n":157,"t":"Which NIST characteristic allows users to provision servers without human intervention from the provider?","type":"mc","opts":[{"l":"A","t":"On-Demand Self-Service"},{"l":"B","t":"Broad Network Access"},{"l":"C","t":"Resource Pooling"},{"l":"D","t":"Measured Service"}],"ans":"A","anst":"On-Demand Self-Service"},{"n":158,"t":"Accessing cloud services from mobile phones, tablets, or laptops anywhere refers to:","type":"mc","opts":[{"l":"A","t":"Rapid Elasticity"},{"l":"B","t":"Broad Network Access"},{"l":"C","t":"Measured Service"},{"l":"D","t":"Resource Pooling"}],"ans":"B","anst":"Broad Network Access"},{"n":159,"t":"The NIST characteristic where provider resources are pooled to serve multiple consumers dynamically is:","type":"mc","opts":[{"l":"A","t":"Resource Pooling"},{"l":"B","t":"On-Demand Self-Service"},{"l":"C","t":"Rapid Elasticity"},{"l":"D","t":"Broad Network Access"}],"ans":"A","anst":"Resource Pooling"},{"n":160,"t":"A shopping website automatically adding servers during a flash sale and removing them afterward exhibits:","type":"mc","opts":[{"l":"A","t":"Rapid Elasticity"},{"l":"B","t":"Resource Pooling"},{"l":"C","t":"Private Cloud"},{"l":"D","t":"Broad Access"}],"ans":"A","anst":"Rapid Elasticity"},{"n":161,"t":"Paying strictly for the cloud resources you actually use represents:","type":"mc","opts":[{"l":"A","t":"On-Demand Self-Service"},{"l":"B","t":"Measured Service"},{"l":"C","t":"Broad Access"},{"l":"D","t":"Elastic Provisioning"}],"ans":"B","anst":"Measured Service"},{"n":162,"t":"A cloud shared by organizations with common security and regulatory needs (e.g., government agencies) is a:","type":"mc","opts":[{"l":"A","t":"Public Cloud"},{"l":"B","t":"Community Cloud"},{"l":"C","t":"Private Cloud"},{"l":"D","t":"Hybrid Cloud"}],"ans":"B","anst":"Community Cloud"},{"n":163,"t":"A bank keeping sensitive financial data in a private cloud while running public consumer apps on AWS uses a:","type":"mc","opts":[{"l":"A","t":"Public Cloud"},{"l":"B","t":"Hybrid Cloud"},{"l":"C","t":"Community Cloud"},{"l":"D","t":"Single-tenant Mesh"}],"ans":"B","anst":"Hybrid Cloud"},{"n":164,"t":"In the \"Pizza as a Service\" model, which tier represents \"Dining at a restaurant\"?","type":"mc","opts":[{"l":"A","t":"On-Premises"},{"l":"B","t":"IaaS"},{"l":"C","t":"PaaS"},{"l":"D","t":"SaaS"}],"ans":"D","anst":"SaaS"},{"n":165,"t":"In the \"Pizza as a Service\" model, \"Take-and-bake pizza\" corresponds to:","type":"mc","opts":[{"l":"A","t":"On-Premises"},{"l":"B","t":"Infrastructure as a Service (IaaS)"},{"l":"C","t":"Platform as a Service (PaaS)"},{"l":"D","t":"Software as a Service (SaaS)"}],"ans":"B","anst":"Infrastructure as a Service (IaaS)"},{"n":166,"t":"Under IaaS, which components are managed by the customer?","type":"mc","opts":[{"l":"A","t":"Physical servers and virtualization"},{"l":"B","t":"OS, runtime, middleware, data, and apps"},{"l":"C","t":"Physical networking cables"},{"l":"D","t":"None"}],"ans":"B","anst":"OS, runtime, middleware, data, and apps"},{"n":167,"t":"Which cloud model allows developers to deploy code without configuring the OS or runtime?","type":"mc","opts":[{"l":"A","t":"IaaS"},{"l":"B","t":"Platform as a Service (PaaS)"},{"l":"C","t":"SaaS"},{"l":"D","t":"On-Premises"}],"ans":"B","anst":"Platform as a Service (PaaS)"},{"n":168,"t":"Google App Engine, Heroku, and Azure App Service are examples of:","type":"mc","opts":[{"l":"A","t":"IaaS"},{"l":"B","t":"PaaS"},{"l":"C","t":"SaaS"},{"l":"D","t":"Private Clouds"}],"ans":"B","anst":"PaaS"},{"n":169,"t":"Under SaaS, who manages the application software, operating system, and hardware infrastructure?","type":"mc","opts":[{"l":"A","t":"The end user"},{"l":"B","t":"The Cloud Service Provider"},{"l":"C","t":"The ISP"},{"l":"D","t":"The local IT department"}],"ans":"B","anst":"The Cloud Service Provider"},{"n":170,"t":"Which company launched first in 2006 and still leads the global cloud infrastructure market?","type":"mc","opts":[{"l":"A","t":"Microsoft Azure"},{"l":"B","t":"Google Cloud"},{"l":"C","t":"Amazon Web Services (AWS)"},{"l":"D","t":"IBM Cloud"}],"ans":"C","anst":"Amazon Web Services (AWS)"},{"n":171,"t":"In an operating system, the six core functions are process, memory, file, device, security, and:","type":"fib","ans":"","anst":"User Interface (UI)"},{"n":172,"t":"To create a blank file or update its timestamp, execute the command:","type":"fib","ans":"","anst":"touch"},{"n":173,"t":"The \"Big Three\" cloud infrastructure providers are AWS, Azure, and:","type":"fib","ans":"","anst":"Google Cloud"},{"n":174,"t":"In Linux, essential administrator commands reside in /bin or /sbin, while installed software libraries live in:","type":"fib","ans":"","anst":"/usr"},{"n":175,"t":"The device that directs data traffic between differing networks is a:","type":"fib","ans":"","anst":"Router"},{"n":176,"t":"A network that covers an entire metropolitan city area is called a:","type":"fib","ans":"","anst":"MAN (Metropolitan Area Network)"},{"n":177,"t":"The OSI model layer that establishes, maintains, and terminates connections is the:","type":"fib","ans":"","anst":"Session Layer (Layer 5)"},{"n":178,"t":"Hypervisors that run on top of an existing host OS (such as VirtualBox) are Type-___ hypervisors.","type":"fib","ans":"","anst":"2"},{"n":179,"t":"Making an identical duplicate copy of an entire virtual machine is called:","type":"fib","ans":"","anst":"Cloning"},{"n":180,"t":"NIST cloud computing is defined by 5 characteristics: on-demand self-service, broad network access, resource pooling, rapid elasticity, and:","type":"fib","ans":"","anst":"Measured Service"},{"n":181,"t":"In the Pizza as a Service analogy, \"Pizza Delivery\" corresponds to:","type":"fib","ans":"","anst":"PaaS (Platform as a Service)"},{"n":182,"t":"A computer connects to a network using internal hardware called a Network:","type":"fib","ans":"","anst":"Interface Card (NIC)"},{"n":183,"t":"In the Linux terminal, typing cd without arguments returns you directly to your:","type":"fib","ans":"","anst":"Home directory (~)"},{"n":184,"t":"A cloud shared by organizations with common missions or security requirements is a:","type":"fib","ans":"","anst":"Community Cloud"},{"n":185,"t":"A network topology where every device connects to every other device directly is a:","type":"fib","ans":"","anst":"Mesh Topology"},{"n":186,"t":"True/False: In a client-server architecture, the server initiates the request to the client browser.","type":"tf","ans":"False","anst":"False"},{"n":187,"t":"True/False: An RTOS guarantees system responses within strict, deterministic time limits.","type":"tf","ans":"True","anst":"True"},{"n":188,"t":"True/False: The Linux command rmdir can delete a directory that contains active files.","type":"tf","ans":"False","anst":"False"},{"n":189,"t":"True/False: The practical TCP/IP suite has 7 layers.","type":"tf","ans":"False","anst":"False"},{"n":190,"t":"True/False: A hub sends incoming data packets only to the specific intended recipient.","type":"tf","ans":"False","anst":"False"},{"n":191,"t":"True/False: If one virtual machine crashes, peer VMs on the same hardware continue running safely.","type":"tf","ans":"True","anst":"True"},{"n":192,"t":"True/False: An .iso file contains an operating system installation image used to boot and install a VM.","type":"tf","ans":"True","anst":"True"},{"n":193,"t":"True/False: Public cloud infrastructure is open to anyone and shared among multiple consumers.","type":"tf","ans":"True","anst":"True"},{"n":194,"t":"True/False: In PaaS, the customer is responsible for patching security updates on the OS.","type":"tf","ans":"False","anst":"False"},{"n":195,"t":"True/False: Most of the Internet, including web servers and cloud infrastructure, runs on Linux.","type":"tf","ans":"True","anst":"True"},{"n":196,"t":"True/False: In a Star topology, if the central switch fails, the entire network connected to it goes down.","type":"tf","ans":"True","anst":"True"},{"n":197,"t":"True/False: The Linux file tree uses drive letters like C: and D:.","type":"tf","ans":"False","anst":"False"},{"n":198,"t":"True/False: Broad Network Access ensures cloud capabilities are accessible over standard networks via laptops, phones, and workstations.","type":"tf","ans":"True","anst":"True"},{"n":199,"t":"True/False: An Access Point allows wireless devices to join an existing wired network.","type":"tf","ans":"True","anst":"True"},{"n":200,"t":"True/False: Under SaaS, the customer manages the underlying servers, runtimes, and databases.","type":"tf","ans":"False","anst":"False"},{"n":201,"t":"Which OS function prevents processes from colliding in physical RAM?","type":"mc","opts":[{"l":"A","t":"Process Scheduling"},{"l":"B","t":"Memory Management"},{"l":"C","t":"Network Access Control"},{"l":"D","t":"File Compression"}],"ans":"B","anst":"Memory Management"},{"n":202,"t":"What advantage does an OS provide to application software developers?","type":"mc","opts":[{"l":"A","t":"Eliminates code logic"},{"l":"B","t":"Standard abstractions so apps don't have to speak directly to raw hardware"},{"l":"C","t":"Removes RAM limits"},{"l":"D","t":"Automatically debugs code"}],"ans":"B","anst":"Standard abstractions so apps don't have to speak directly to raw hardware"},{"n":203,"t":"Which software is classified as system software rather than an application?","type":"mc","opts":[{"l":"A","t":"Google Chrome"},{"l":"B","t":"Operating System"},{"l":"C","t":"Microsoft Word"},{"l":"D","t":"VLC Media Player"}],"ans":"B","anst":"Operating System"},{"n":204,"t":"In an OS, the subsystem deciding which program gets the CPU and for how long is:","type":"mc","opts":[{"l":"A","t":"Device Driver"},{"l":"B","t":"Process Manager"},{"l":"C","t":"Memory Manager"},{"l":"D","t":"Hypervisor"}],"ans":"B","anst":"Process Manager"},{"n":205,"t":"What would happen on a computer running without an operating system?","type":"mc","opts":[{"l":"A","t":"Increased speed"},{"l":"B","t":"No shared screen, no multitasking, and apps must speak directly to hardware"},{"l":"C","t":"Automated cloud backup"},{"l":"D","t":"Native CLI shells run automatically"}],"ans":"B","anst":"No shared screen, no multitasking, and apps must speak directly to hardware"},{"n":206,"t":"Batch operating systems were originally designed to:","type":"mc","opts":[{"l":"A","t":"Provide touch UI"},{"l":"B","t":"Run collected groups of jobs without interactive delays"},{"l":"C","t":"Host websites"},{"l":"D","t":"Control car airbags"}],"ans":"B","anst":"Run collected groups of jobs without interactive delays"},{"n":207,"t":"Which operating system family was built from its roots around multi-user time-sharing?","type":"mc","opts":[{"l":"A","t":"MS-DOS"},{"l":"B","t":"UNIX / Linux"},{"l":"C","t":"Classic Mac OS"},{"l":"D","t":"Windows 95"}],"ans":"B","anst":"UNIX / Linux"},{"n":208,"t":"What distinguishes an RTOS from a general-purpose operating system?","type":"mc","opts":[{"l":"A","t":"High gaming frame rates"},{"l":"B","t":"Missing a timing deadline is a system failure"},{"l":"C","t":"Supports more users"},{"l":"D","t":"Eliminates storage drives"}],"ans":"B","anst":"Missing a timing deadline is a system failure"},{"n":209,"t":"Which system relies directly on an RTOS?","type":"mc","opts":[{"l":"A","t":"Smart TV"},{"l":"B","t":"Automotive airbag controller"},{"l":"C","t":"Web search engine"},{"l":"D","t":"Office spreadsheet"}],"ans":"B","anst":"Automotive airbag controller"},{"n":210,"t":"KaiOS and HarmonyOS are examples of:","type":"mc","opts":[{"l":"A","t":"Batch OS"},{"l":"B","t":"Mobile Operating Systems"},{"l":"C","t":"Hard RTOS"},{"l":"D","t":"Server Hypervisors"}],"ans":"B","anst":"Mobile Operating Systems"},{"n":211,"t":"What makes Linux the primary OS of cloud infrastructure and supercomputers?","type":"mc","opts":[{"l":"A","t":"It is proprietary"},{"l":"B","t":"It is free, open-source, modular, and provides robust CLI tools"},{"l":"C","t":"It only supports one user"},{"l":"D","t":"It has no file permissions"}],"ans":"B","anst":"It is free, open-source, modular, and provides robust CLI tools"},{"n":212,"t":"In the Linux file hierarchy, where are user-installed programs and libraries kept?","type":"mc","opts":[{"l":"A","t":"/tmp"},{"l":"B","t":"/usr"},{"l":"C","t":"/dev"},{"l":"D","t":"/proc"}],"ans":"B","anst":"/usr"},{"n":213,"t":"If you need to edit system-wide network configuration files in Linux, you inspect:","type":"mc","opts":[{"l":"A","t":"/home"},{"l":"B","t":"/etc"},{"l":"C","t":"/bin"},{"l":"D","t":"/root"}],"ans":"B","anst":"/etc"},{"n":214,"t":"What is stored inside the Linux /root directory?","type":"mc","opts":[{"l":"A","t":"All system files"},{"l":"B","t":"The administrator's personal home folder"},{"l":"C","t":"Public downloads"},{"l":"D","t":"Log files"}],"ans":"B","anst":"The administrator's personal home folder"},{"n":215,"t":"What will pwd return if user student runs it right after opening a terminal?","type":"mc","opts":[{"l":"A","t":"/"},{"l":"B","t":"/home/student"},{"l":"C","t":"/bin"},{"l":"D","t":"/root"}],"ans":"B","anst":"/home/student"},{"n":216,"t":"Which command creates a directory named assignments?","type":"mc","opts":[{"l":"A","t":"touch assignments"},{"l":"B","t":"mkdir assignments"},{"l":"C","t":"cd assignments"},{"l":"D","t":"cat assignments"}],"ans":"B","anst":"mkdir assignments"},{"n":217,"t":"How do you move up one level into the parent directory in the Linux terminal?","type":"mc","opts":[{"l":"A","t":"cd ~"},{"l":"B","t":"cd .."},{"l":"C","t":"cd /"},{"l":"D","t":"cd -"}],"ans":"B","anst":"cd .."},{"n":218,"t":"What command deletes an empty directory named old_folder?","type":"mc","opts":[{"l":"A","t":"rm old_folder"},{"l":"B","t":"rmdir old_folder"},{"l":"C","t":"mv old_folder"},{"l":"D","t":"touch old_folder"}],"ans":"B","anst":"rmdir old_folder"},{"n":219,"t":"Which command creates an empty file or updates its timestamp?","type":"mc","opts":[{"l":"A","t":"mkdir"},{"l":"B","t":"touch"},{"l":"C","t":"cp"},{"l":"D","t":"mv"}],"ans":"B","anst":"touch"},{"n":220,"t":"To duplicate data.csv to data_backup.csv, execute:","type":"mc","opts":[{"l":"A","t":"mv data.csv data_backup.csv"},{"l":"B","t":"cp data.csv data_backup.csv"},{"l":"C","t":"touch data.csv data_backup.csv"},{"l":"D","t":"ls data.csv data_backup.csv"}],"ans":"B","anst":"cp data.csv data_backup.csv"},{"n":221,"t":"Which command both moves files between directories and renames files?","type":"mc","opts":[{"l":"A","t":"cp"},{"l":"B","t":"mv"},{"l":"C","t":"rm"},{"l":"D","t":"chmod"}],"ans":"B","anst":"mv"},{"n":222,"t":"What command removes a single file named temp.log?","type":"mc","opts":[{"l":"A","t":"rmdir temp.log"},{"l":"B","t":"rm temp.log"},{"l":"C","t":"del temp.log"},{"l":"D","t":"clear temp.log"}],"ans":"B","anst":"rm temp.log"},{"n":223,"t":"What is the function of the cat command in Linux?","type":"mc","opts":[{"l":"A","t":"Draws GUI windows"},{"l":"B","t":"Displays a file's contents directly to the console"},{"l":"C","t":"Compiles code"},{"l":"D","t":"Modifies file permissions"}],"ans":"B","anst":"Displays a file's contents directly to the console"},{"n":224,"t":"Which command grants execute permissions to run.sh?","type":"mc","opts":[{"l":"A","t":"chmod +x run.sh"},{"l":"B","t":"touch +x run.sh"},{"l":"C","t":"cp +x run.sh"},{"l":"D","t":"mv run.sh /bin"}],"ans":"A","anst":"chmod +x run.sh"},{"n":225,"t":"A computer network is fundamentally used to:","type":"mc","opts":[{"l":"A","t":"Overclock processors"},{"l":"B","t":"Share resources, exchange files, and communicate"},{"l":"C","t":"Replace system RAM"},{"l":"D","t":"Erase hard drives"}],"ans":"B","anst":"Share resources, exchange files, and communicate"},{"n":226,"t":"What type of network connects a smartphone to wireless earbuds?","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"PAN"},{"l":"C","t":"WAN"},{"l":"D","t":"MAN"}],"ans":"B","anst":"PAN"},{"n":227,"t":"A network interconnecting all workstations in a college lab is a:","type":"mc","opts":[{"l":"A","t":"PAN"},{"l":"B","t":"LAN"},{"l":"C","t":"MAN"},{"l":"D","t":"WAN"}],"ans":"B","anst":"LAN"},{"n":228,"t":"A municipal network connecting traffic cameras across a city is a:","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"MAN"},{"l":"C","t":"PAN"},{"l":"D","t":"WAN"}],"ans":"B","anst":"MAN"},{"n":229,"t":"Which network spans across countries and continents?","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"WAN"},{"l":"C","t":"MAN"},{"l":"D","t":"PAN"}],"ans":"B","anst":"WAN"},{"n":230,"t":"In which topology does the failure of the central switch disconnect all connected nodes?","type":"mc","opts":[{"l":"A","t":"Bus"},{"l":"B","t":"Star"},{"l":"C","t":"Ring"},{"l":"D","t":"Mesh"}],"ans":"B","anst":"Star"},{"n":231,"t":"Which topology connects all machines along a single shared linear cable?","type":"mc","opts":[{"l":"A","t":"Star"},{"l":"B","t":"Bus"},{"l":"C","t":"Ring"},{"l":"D","t":"Mesh"}],"ans":"B","anst":"Bus"},{"n":232,"t":"In which topology does each device connect to exactly two neighbors, forming a closed loop?","type":"mc","opts":[{"l":"A","t":"Star"},{"l":"B","t":"Ring"},{"l":"C","t":"Bus"},{"l":"D","t":"Mesh"}],"ans":"B","anst":"Ring"},{"n":233,"t":"Which topology connects every node directly to all other nodes?","type":"mc","opts":[{"l":"A","t":"Bus"},{"l":"B","t":"Mesh"},{"l":"C","t":"Star"},{"l":"D","t":"Ring"}],"ans":"B","anst":"Mesh"},{"n":234,"t":"What happens during a DNS lookup when navigating to a URL?","type":"mc","opts":[{"l":"A","t":"Web files are compiled"},{"l":"B","t":"The domain name is translated into an IP address"},{"l":"C","t":"Local RAM is emptied"},{"l":"D","t":"The router resets"}],"ans":"B","anst":"The domain name is translated into an IP address"},{"n":235,"t":"In Client-Server Architecture, the primary role of the client is to:","type":"mc","opts":[{"l":"A","t":"Query databases"},{"l":"B","t":"Initiate requests and render responses for the user"},{"l":"C","t":"Route packets across the WAN"},{"l":"D","t":"Store user profiles centrally"}],"ans":"B","anst":"Initiate requests and render responses for the user"},{"n":236,"t":"Why is a network hub considered inefficient?","type":"mc","opts":[{"l":"A","t":"It cannot transmit bits"},{"l":"B","t":"It broadcasts incoming traffic out to every single port"},{"l":"C","t":"It requires dedicated software"},{"l":"D","t":"It caps speed at 1 kbps"}],"ans":"B","anst":"It broadcasts incoming traffic out to every single port"},{"n":237,"t":"How does a network switch determine which port to forward a frame to?","type":"mc","opts":[{"l":"A","t":"It broadcasts to everyone"},{"l":"B","t":"It checks the physical destination MAC address in the frame header"},{"l":"C","t":"It asks the ISP"},{"l":"D","t":"It drops odd packets"}],"ans":"B","anst":"It checks the physical destination MAC address in the frame header"},{"n":238,"t":"Which device connects a local network to the external public Internet?","type":"mc","opts":[{"l":"A","t":"Hub"},{"l":"B","t":"Router"},{"l":"C","t":"Switch"},{"l":"D","t":"NIC"}],"ans":"B","anst":"Router"},{"n":239,"t":"A device that converts signals between your ISP and your home network is a:","type":"mc","opts":[{"l":"A","t":"NIC"},{"l":"B","t":"Modem"},{"l":"C","t":"Access Point"},{"l":"D","t":"Hub"}],"ans":"B","anst":"Modem"},{"n":240,"t":"What is the role of a Wireless Access Point (WAP)?","type":"mc","opts":[{"l":"A","t":"Routes WAN packets"},{"l":"B","t":"Lets wireless devices join a wired network"},{"l":"C","t":"Translates domain names"},{"l":"D","t":"Runs guest virtual machines"}],"ans":"B","anst":"Lets wireless devices join a wired network"},{"n":241,"t":"What hardware component provides a computer with its physical MAC address and network link?","type":"mc","opts":[{"l":"A","t":"BIOS"},{"l":"B","t":"Network Interface Card (NIC)"},{"l":"C","t":"CPU"},{"l":"D","t":"RAM module"}],"ans":"B","anst":"Network Interface Card (NIC)"},{"n":242,"t":"What is the main purpose of network protocols like HTTP, SMTP, and TCP/IP?","type":"mc","opts":[{"l":"A","t":"Connect optical cables"},{"l":"B","t":"Provide standardized rules and formats governing communication"},{"l":"C","t":"Power off idle network ports"},{"l":"D","t":"Emulate virtual disks"}],"ans":"B","anst":"Provide standardized rules and formats governing communication"},{"n":243,"t":"In the 7-layer OSI model, which layer handles binary transmission over physical media?","type":"mc","opts":[{"l":"A","t":"Layer 2 (Data Link)"},{"l":"B","t":"Layer 1 (Physical)"},{"l":"C","t":"Layer 3 (Network)"},{"l":"D","t":"Layer 4 (Transport)"}],"ans":"B","anst":"Layer 1 (Physical)"},{"n":244,"t":"Node-to-node frame transfer and MAC addressing occur at which OSI layer?","type":"mc","opts":[{"l":"A","t":"Physical Layer"},{"l":"B","t":"Data Link Layer (Layer 2)"},{"l":"C","t":"Network Layer"},{"l":"D","t":"Session Layer"}],"ans":"B","anst":"Data Link Layer (Layer 2)"},{"n":245,"t":"Which OSI layer establishes, maintains, and terminates communication sessions?","type":"mc","opts":[{"l":"A","t":"Transport Layer"},{"l":"B","t":"Session Layer (Layer 5)"},{"l":"C","t":"Presentation Layer"},{"l":"D","t":"Data Link Layer"}],"ans":"B","anst":"Session Layer (Layer 5)"},{"n":246,"t":"Which layer of the practical TCP/IP suite corresponds to the Transport layer of the OSI model?","type":"mc","opts":[{"l":"A","t":"Network Access"},{"l":"B","t":"Transport Layer"},{"l":"C","t":"Internet Layer"},{"l":"D","t":"Application Layer"}],"ans":"B","anst":"Transport Layer"},{"n":247,"t":"In the TCP/IP suite, which protocol provides reliable communication between devices?","type":"mc","opts":[{"l":"A","t":"UDP"},{"l":"B","t":"TCP"},{"l":"C","t":"IP"},{"l":"D","t":"ARP"}],"ans":"B","anst":"TCP"},{"n":248,"t":"What software is responsible for creating, running, and managing virtual machines?","type":"mc","opts":[{"l":"A","t":"Hypervisor"},{"l":"B","t":"Compiler"},{"l":"C","t":"Shell"},{"l":"D","t":"Bootloader"}],"ans":"A","anst":"Hypervisor"},{"n":249,"t":"Which of the following is an example of a Type-2 (hosted) hypervisor?","type":"mc","opts":[{"l":"A","t":"VMware ESXi"},{"l":"B","t":"Oracle VM VirtualBox"},{"l":"C","t":"Xen"},{"l":"D","t":"Bare-metal KVM"}],"ans":"B","anst":"Oracle VM VirtualBox"},{"n":250,"t":"How does virtualization improve server utilization in enterprise data centers?","type":"mc","opts":[{"l":"A","t":"Powers off servers permanently"},{"l":"B","t":"Runs multiple VMs on a single server, using full hardware capacity"},{"l":"C","t":"Converts disk storage to RAM"},{"l":"D","t":"Eliminates network access"}],"ans":"B","anst":"Runs multiple VMs on a single server, using full hardware capacity"},{"n":251,"t":"A virtual machine's complete state can be preserved at a specific moment using a:","type":"mc","opts":[{"l":"A","t":"Migration"},{"l":"B","t":"Snapshot"},{"l":"C","t":"Bridge"},{"l":"D","t":"Reboot"}],"ans":"B","anst":"Snapshot"},{"n":252,"t":"What disk image format is attached to a VM to install its operating system?","type":"mc","opts":[{"l":"A","t":".tar.gz"},{"l":"B","t":".iso"},{"l":"C","t":".dll"},{"l":"D","t":".sys"}],"ans":"B","anst":".iso"},{"n":253,"t":"Which VM action permanently deletes the VM and frees its allocated resources?","type":"mc","opts":[{"l":"A","t":"Stop"},{"l":"B","t":"Delete"},{"l":"C","t":"Snapshot"},{"l":"D","t":"Clone"}],"ans":"B","anst":"Delete"},{"n":254,"t":"What is a primary benefit of using virtual machines for students and developers?","type":"mc","opts":[{"l":"A","t":"Code compiles twice as fast"},{"l":"B","t":"Learn Linux and test code across multiple OSes safely in isolation"},{"l":"C","t":"Eliminates the compiler"},{"l":"D","t":"Blocks all network traffic"}],"ans":"B","anst":"Learn Linux and test code across multiple OSes safely in isolation"},{"n":255,"t":"Cloud computing is described as:","type":"mc","opts":[{"l":"A","t":"Buying a private generator"},{"l":"B","t":"Like electricity: plug in and pay for what you use"},{"l":"C","t":"Running only local applications"},{"l":"D","t":"Owning a private power plant"}],"ans":"B","anst":"Like electricity: plug in and pay for what you use"},{"n":256,"t":"What underlying technology makes hyperscale cloud data centers possible?","type":"mc","opts":[{"l":"A","t":"Magnetic tape reels"},{"l":"B","t":"Virtualization managed by hypervisors"},{"l":"C","t":"Batch punch cards"},{"l":"D","t":"Dial-up modems"}],"ans":"B","anst":"Virtualization managed by hypervisors"},{"n":257,"t":"Which NIST characteristic allows users to provision computing power automatically as needed?","type":"mc","opts":[{"l":"A","t":"Measured Service"},{"l":"B","t":"On-Demand Self-Service"},{"l":"C","t":"Resource Pooling"},{"l":"D","t":"Rapid Elasticity"}],"ans":"B","anst":"On-Demand Self-Service"},{"n":258,"t":"Cloud services that can be accessed over the network across phones, tablets, and laptops exhibit:","type":"mc","opts":[{"l":"A","t":"Broad Network Access"},{"l":"B","t":"Measured Service"},{"l":"C","t":"Rapid Elasticity"},{"l":"D","t":"Resource Pooling"}],"ans":"A","anst":"Broad Network Access"},{"n":259,"t":"What NIST cloud characteristic involves sharing physical resources dynamically across multiple tenants?","type":"mc","opts":[{"l":"A","t":"On-Demand Self-Service"},{"l":"B","t":"Resource Pooling"},{"l":"C","t":"Broad Network Access"},{"l":"D","t":"Metered Invoicing"}],"ans":"B","anst":"Resource Pooling"},{"n":260,"t":"A streaming service scaling up servers during an event and scaling down afterward illustrates:","type":"mc","opts":[{"l":"A","t":"Resource Pooling"},{"l":"B","t":"Rapid Elasticity"},{"l":"C","t":"Community Cloud"},{"l":"D","t":"Fixed Capacity"}],"ans":"B","anst":"Rapid Elasticity"},{"n":261,"t":"Paying only for the cloud resources you consume is known as:","type":"mc","opts":[{"l":"A","t":"Broad Network Access"},{"l":"B","t":"Measured Service"},{"l":"C","t":"On-Demand Provisioning"},{"l":"D","t":"Multi-Tenancy"}],"ans":"B","anst":"Measured Service"},{"n":262,"t":"An infrastructure open to anyone and operated by providers like AWS or Google Cloud is a:","type":"mc","opts":[{"l":"A","t":"Private Cloud"},{"l":"B","t":"Public Cloud"},{"l":"C","t":"Community Cloud"},{"l":"D","t":"Hybrid Cloud"}],"ans":"B","anst":"Public Cloud"},{"n":263,"t":"A cloud infrastructure built and operated exclusively for a single organization is a:","type":"mc","opts":[{"l":"A","t":"Public Cloud"},{"l":"B","t":"Private Cloud"},{"l":"C","t":"Hybrid Cloud"},{"l":"D","t":"Community Cloud"}],"ans":"B","anst":"Private Cloud"},{"n":264,"t":"Combining a private on-premises cloud for sensitive data with public cloud servers for consumer apps forms a:","type":"mc","opts":[{"l":"A","t":"Community Cloud"},{"l":"B","t":"Hybrid Cloud"},{"l":"C","t":"Public Mesh"},{"l":"D","t":"Peer-to-Peer Cloud"}],"ans":"B","anst":"Hybrid Cloud"},{"n":265,"t":"Which cloud deployment model is shared by organizations with common security and mission needs?","type":"mc","opts":[{"l":"A","t":"Public Cloud"},{"l":"B","t":"Community Cloud"},{"l":"C","t":"Private Cloud"},{"l":"D","t":"Hybrid Cloud"}],"ans":"B","anst":"Community Cloud"},{"n":266,"t":"In the \"Pizza as a Service\" analogy, making pizza at home from scratch corresponds to:","type":"mc","opts":[{"l":"A","t":"SaaS"},{"l":"B","t":"On-Premises"},{"l":"C","t":"PaaS"},{"l":"D","t":"IaaS"}],"ans":"B","anst":"On-Premises"},{"n":267,"t":"Under Infrastructure as a Service (IaaS), which component is the customer's responsibility?","type":"mc","opts":[{"l":"A","t":"Physical server hardware"},{"l":"B","t":"Operating System, runtime, middleware, data, and applications"},{"l":"C","t":"Data center cooling"},{"l":"D","t":"Physical hypervisor maintenance"}],"ans":"B","anst":"Operating System, runtime, middleware, data, and applications"},{"n":268,"t":"Which cloud service model allows developers to deploy code without managing servers, the OS, or runtimes?","type":"mc","opts":[{"l":"A","t":"IaaS"},{"l":"B","t":"Platform as a Service (PaaS)"},{"l":"C","t":"SaaS"},{"l":"D","t":"On-Premises"}],"ans":"B","anst":"Platform as a Service (PaaS)"},{"n":269,"t":"Google App Engine and Microsoft Azure App Service are real-world examples of:","type":"mc","opts":[{"l":"A","t":"IaaS"},{"l":"B","t":"PaaS"},{"l":"C","t":"SaaS"},{"l":"D","t":"DaaS"}],"ans":"B","anst":"PaaS"},{"n":270,"t":"In Software as a Service (SaaS), what is managed by the cloud service provider?","type":"mc","opts":[{"l":"A","t":"Only physical servers"},{"l":"B","t":"Everything from hardware and OS up to the finished application"},{"l":"C","t":"Only disk storage"},{"l":"D","t":"Only client network access"}],"ans":"B","anst":"Everything from hardware and OS up to the finished application"},{"n":271,"t":"An Operating System manages hardware resources so running programs do not:","type":"fib","ans":"","anst":"Collide"},{"n":272,"t":"In Linux, all files live in a single unified tree starting at the root denoted by:","type":"fib","ans":"","anst":"/ (Forward slash)"},{"n":273,"t":"The Linux command used to show the folder you are currently in is:","type":"fib","ans":"","anst":"pwd"},{"n":274,"t":"To create a new folder named src in Linux, use the command:","type":"fib","ans":"","anst":"mkdir src"},{"n":275,"t":"The command to copy a file or folder in Linux is:","type":"fib","ans":"","anst":"cp"},{"n":276,"t":"A network that connects an individual's personal devices across a few meters is a:","type":"fib","ans":"","anst":"PAN (Personal Area Network)"},{"n":277,"t":"The network topology that connects all nodes in an unbroken circle where each host links to two neighbors is the:","type":"fib","ans":"","anst":"Ring Topology"},{"n":278,"t":"In a local network, a ___ sends data only to the intended recipient device rather than broadcasting.","type":"fib","ans":"","anst":"Switch"},{"n":279,"t":"The theoretical OSI reference model contains ___ layers.","type":"fib","ans":"","anst":"7"},{"n":280,"t":"Layer 3 of the OSI reference model is the:","type":"fib","ans":"","anst":"Network Layer"},{"n":281,"t":"Software that creates, runs, and manages virtual machines is called a:","type":"fib","ans":"","anst":"Hypervisor"},{"n":282,"t":"Saving the exact state of a virtual machine to return to later is taking a:","type":"fib","ans":"","anst":"Snapshot"},{"n":283,"t":"The NIST cloud definition specifies ___ essential characteristics.","type":"fib","ans":"","anst":"5"},{"n":284,"t":"A cloud architecture combining public and private cloud platforms is a:","type":"fib","ans":"","anst":"Hybrid Cloud"},{"n":285,"t":"In the Pizza as a Service analogy, SaaS corresponds to ___ at a restaurant.","type":"fib","ans":"","anst":"Dining"},{"n":286,"t":"True/False: In a multi-tasking operating system, the process manager schedules tasks so multiple programs can share the CPU.","type":"tf","ans":"True","anst":"True"},{"n":287,"t":"True/False: An RTOS guarantees system responses within strict, deterministic time limits.","type":"tf","ans":"True","anst":"True"},{"n":288,"t":"True/False: In Linux, the /etc directory is where user personal documents and pictures are stored.","type":"tf","ans":"False","anst":"False"},{"n":289,"t":"True/False: The rmdir command can delete directories that still contain files.","type":"tf","ans":"False","anst":"False"},{"n":290,"t":"True/False: The command touch creates an empty file if the specified file does not exist.","type":"tf","ans":"True","anst":"True"},{"n":291,"t":"True/False: In a star topology, if one workstation cable breaks, the entire network shuts down.","type":"tf","ans":"False","anst":"False"},{"n":292,"t":"True/False: A network hub forwards incoming packets only to the specific intended destination port.","type":"tf","ans":"False","anst":"False"},{"n":293,"t":"True/False: Routers direct traffic between different networks.","type":"tf","ans":"True","anst":"True"},{"n":294,"t":"True/False: DNS translates domain names into numeric IP addresses.","type":"tf","ans":"True","anst":"True"},{"n":295,"t":"True/False: Type-2 hypervisors run directly on bare physical server hardware without a host OS.","type":"tf","ans":"False","anst":"False"},{"n":296,"t":"True/False: Virtual machines allow multiple guest operating systems to run concurrently on a single physical computer.","type":"tf","ans":"True","anst":"True"},{"n":297,"t":"True/False: Taking a VM snapshot alters and overwrites the primary host operating system files.","type":"tf","ans":"False","anst":"False"},{"n":298,"t":"True/False: Rapid elasticity allows cloud systems to scale resources up or down automatically based on demand.","type":"tf","ans":"True","anst":"True"},{"n":299,"t":"True/False: Under the IaaS cloud model, the cloud provider manages the operating system and applications.","type":"tf","ans":"False","anst":"False"},{"n":300,"t":"True/False: Software as a Service (SaaS) delivers applications over the web, requiring no installation or maintenance of servers by end users.","type":"tf","ans":"True","anst":"True"},{"n":301,"t":"The primary purpose of an Operating System is to act as a bridge between:","type":"mc","opts":[{"l":"A","t":"The compiler and the linker"},{"l":"B","t":"The user/applications and the machine hardware"},{"l":"C","t":"LAN and WAN"},{"l":"D","t":"The VM and the monitor"}],"ans":"B","anst":"The user/applications and the machine hardware"},{"n":302,"t":"In the air-traffic controller analogy, what represents the air-traffic controller itself?","type":"mc","opts":[{"l":"A","t":"CPU"},{"l":"B","t":"Operating System"},{"l":"C","t":"Hypervisor"},{"l":"D","t":"Internet Service Provider"}],"ans":"B","anst":"Operating System"},{"n":303,"t":"Which OS management function ensures that programs do not overwrite the same RAM memory space?","type":"mc","opts":[{"l":"A","t":"Process Management"},{"l":"B","t":"Memory Management"},{"l":"C","t":"Device Management"},{"l":"D","t":"Storage Formatting"}],"ans":"B","anst":"Memory Management"},{"n":304,"t":"Which core OS component is tasked with organizing files and folders and controlling access permissions?","type":"mc","opts":[{"l":"A","t":"Memory Manager"},{"l":"B","t":"File Management"},{"l":"C","t":"UI Renderer"},{"l":"D","t":"Network Access Layer"}],"ans":"B","anst":"File Management"},{"n":305,"t":"The OS communicates with hardware devices such as printers, keyboards, and disks via:","type":"mc","opts":[{"l":"A","t":"Device drivers"},{"l":"B","t":"Compilers"},{"l":"C","t":"Virtual machines"},{"l":"D","t":"Web sockets"}],"ans":"A","anst":"Device drivers"},{"n":306,"t":"Enforcing user logins, permissions, and user isolation is handled by:","type":"mc","opts":[{"l":"A","t":"Device Management"},{"l":"B","t":"Security & Access Control"},{"l":"C","t":"File Formatting"},{"l":"D","t":"BIOS"}],"ans":"B","anst":"Security & Access Control"},{"n":307,"t":"Which user interface paradigm uses windows, desktop icons, and buttons?","type":"mc","opts":[{"l":"A","t":"Command-Line Interface (CLI)"},{"l":"B","t":"Graphical User Interface (GUI)"},{"l":"C","t":"Application Programming Interface (API)"},{"l":"D","t":"System Call Interface"}],"ans":"B","anst":"Graphical User Interface (GUI)"},{"n":308,"t":"When you double-click an application icon, which OS action occurs first?","type":"mc","opts":[{"l":"A","t":"Display manager renders the window"},{"l":"B","t":"The OS locates the program file on disk"},{"l":"C","t":"The network card requests an IP"},{"l":"D","t":"The compiler compiles the source code"}],"ans":"B","anst":"The OS locates the program file on disk"},{"n":309,"t":"What happens directly after the memory manager allocates RAM for a newly launched program?","type":"mc","opts":[{"l":"A","t":"The program is scheduled on the CPU by the process manager"},{"l":"B","t":"The disk is reformatted"},{"l":"C","t":"The network is terminated"},{"l":"D","t":"The monitor changes resolution"}],"ans":"A","anst":"The program is scheduled on the CPU by the process manager"},{"n":310,"t":"An operating system where jobs are collected and run in groups without direct interaction is a:","type":"mc","opts":[{"l":"A","t":"Real-Time OS"},{"l":"B","t":"Batch OS"},{"l":"C","t":"Time-Sharing OS"},{"l":"D","t":"Distributed OS"}],"ans":"B","anst":"Batch OS"},{"n":311,"t":"Which of the following is an example of a Batch Operating System?","type":"mc","opts":[{"l":"A","t":"IBM OS/360 or z/OS"},{"l":"B","t":"Google Android"},{"l":"C","t":"FreeRTOS"},{"l":"D","t":"Ubuntu Desktop"}],"ans":"A","anst":"IBM OS/360 or z/OS"},{"n":312,"t":"In a Time-Sharing Operating System, multi-user interaction is achieved through:","type":"mc","opts":[{"l":"A","t":"Running one process until power-down"},{"l":"B","t":"Rapidly switching the CPU between multiple users' tasks"},{"l":"C","t":"Eliminating virtual memory"},{"l":"D","t":"Disabling interrupts"}],"ans":"B","anst":"Rapidly switching the CPU between multiple users' tasks"},{"n":313,"t":"Which operating system family is an example of a Time-Sharing system?","type":"mc","opts":[{"l":"A","t":"VxWorks"},{"l":"B","t":"UNIX / Linux"},{"l":"C","t":"IBM OS/360"},{"l":"D","t":"MS-DOS"}],"ans":"B","anst":"UNIX / Linux"},{"n":314,"t":"An operating system that connects multiple computers so they appear as a single system is a:","type":"mc","opts":[{"l":"A","t":"Distributed OS"},{"l":"B","t":"Batch OS"},{"l":"C","t":"Mobile OS"},{"l":"D","t":"Single-User OS"}],"ans":"A","anst":"Distributed OS"},{"n":315,"t":"Amoeba, Plan 9 from Bell Labs, and Google Fuchsia are examples of:","type":"mc","opts":[{"l":"A","t":"Mobile operating systems"},{"l":"B","t":"Distributed operating systems"},{"l":"C","t":"Batch systems"},{"l":"D","t":"Hard Real-Time systems"}],"ans":"B","anst":"Distributed operating systems"},{"n":316,"t":"What is the defining characteristic of a Real-Time Operating System (RTOS)?","type":"mc","opts":[{"l":"A","t":"High frame rate video"},{"l":"B","t":"Guarantees a response within a strict time limit"},{"l":"C","t":"Infinite battery life"},{"l":"D","t":"Supports millions of web users"}],"ans":"B","anst":"Guarantees a response within a strict time limit"},{"n":317,"t":"Which safety-critical application requires an RTOS?","type":"mc","opts":[{"l":"A","t":"Medical pacemaker / Car airbag"},{"l":"B","t":"Office spreadsheet"},{"l":"C","t":"Photo editing software"},{"l":"D","t":"Video streaming platform"}],"ans":"A","anst":"Medical pacemaker / Car airbag"},{"n":318,"t":"FreeRTOS, VxWorks, and QNX belong to which operating system category?","type":"mc","opts":[{"l":"A","t":"Mobile OS"},{"l":"B","t":"Real-Time Operating System (RTOS)"},{"l":"C","t":"Batch OS"},{"l":"D","t":"Distributed OS"}],"ans":"B","anst":"Real-Time Operating System (RTOS)"},{"n":319,"t":"Mobile operating systems (Android, iOS) are designed primarily for:","type":"mc","opts":[{"l":"A","t":"Mainframe batch punch cards"},{"l":"B","t":"Touch, battery life, and app ecosystems"},{"l":"C","t":"Bare-metal hypervisor orchestration"},{"l":"D","t":"Eliminating the file system"}],"ans":"B","anst":"Touch, battery life, and app ecosystems"},{"n":320,"t":"Over 96% of the world's top one million web servers run which operating system?","type":"mc","opts":[{"l":"A","t":"Windows Server"},{"l":"B","t":"Linux"},{"l":"C","t":"macOS"},{"l":"D","t":"FreeBSD"}],"ans":"B","anst":"Linux"},{"n":321,"t":"In Linux, the entire file directory structure begins at a single root designated by:","type":"mc","opts":[{"l":"A","t":"C:\\"},{"l":"B","t":"/"},{"l":"C","t":"/root"},{"l":"D","t":"~"}],"ans":"B","anst":"/"},{"n":322,"t":"Which Linux folder contains essential command binaries such as ls, cp, and rm?","type":"mc","opts":[{"l":"A","t":"/etc"},{"l":"B","t":"/bin"},{"l":"C","t":"/home"},{"l":"D","t":"/var"}],"ans":"B","anst":"/bin"},{"n":323,"t":"System-wide configuration files in Linux are stored inside:","type":"mc","opts":[{"l":"A","t":"/etc"},{"l":"B","t":"/bin"},{"l":"C","t":"/home"},{"l":"D","t":"/dev"}],"ans":"A","anst":"/etc"},{"n":324,"t":"Personal folders for regular users reside within:","type":"mc","opts":[{"l":"A","t":"/root"},{"l":"B","t":"/home"},{"l":"C","t":"/var"},{"l":"D","t":"/usr"}],"ans":"B","anst":"/home"},{"n":325,"t":"Dynamic runtime data, including logs and caches, are kept inside:","type":"mc","opts":[{"l":"A","t":"/var"},{"l":"B","t":"/etc"},{"l":"C","t":"/bin"},{"l":"D","t":"/tmp"}],"ans":"A","anst":"/var"},{"n":326,"t":"The private home folder for the administrator (root user) is:","type":"mc","opts":[{"l":"A","t":"/home/root"},{"l":"B","t":"/root"},{"l":"C","t":"/"},{"l":"D","t":"/admin"}],"ans":"B","anst":"/root"},{"n":327,"t":"Installed software programs and supporting libraries reside in:","type":"mc","opts":[{"l":"A","t":"/usr"},{"l":"B","t":"/etc"},{"l":"C","t":"/var"},{"l":"D","t":"/bin"}],"ans":"A","anst":"/usr"},{"n":328,"t":"Which command prints the folder you are currently in?","type":"mc","opts":[{"l":"A","t":"ls"},{"l":"B","t":"pwd"},{"l":"C","t":"cd"},{"l":"D","t":"dir"}],"ans":"B","anst":"pwd"},{"n":329,"t":"The command used to display files and folders in the current directory is:","type":"mc","opts":[{"l":"A","t":"ls"},{"l":"B","t":"cat"},{"l":"C","t":"pwd"},{"l":"D","t":"touch"}],"ans":"A","anst":"ls"},{"n":330,"t":"To change directories and move into an existing folder named docs, run:","type":"mc","opts":[{"l":"A","t":"mv docs"},{"l":"B","t":"cd docs"},{"l":"C","t":"mkdir docs"},{"l":"D","t":"pwd docs"}],"ans":"B","anst":"cd docs"},{"n":331,"t":"Which command creates a brand new folder named labs?","type":"mc","opts":[{"l":"A","t":"touch labs"},{"l":"B","t":"mkdir labs"},{"l":"C","t":"rmdir labs"},{"l":"D","t":"cat labs"}],"ans":"B","anst":"mkdir labs"},{"n":332,"t":"What condition must be met for rmdir to delete a directory?","type":"mc","opts":[{"l":"A","t":"The directory must be empty"},{"l":"B","t":"The directory must contain files"},{"l":"C","t":"The user must be root"},{"l":"D","t":"The directory must be executable"}],"ans":"A","anst":"The directory must be empty"},{"n":333,"t":"Which command creates an empty file named test.py?","type":"mc","opts":[{"l":"A","t":"touch test.py"},{"l":"B","t":"mkdir test.py"},{"l":"C","t":"cat test.py"},{"l":"D","t":"rm test.py"}],"ans":"A","anst":"touch test.py"},{"n":334,"t":"To copy an existing file named code.py to code_v2.py, which command is used?","type":"mc","opts":[{"l":"A","t":"mv code.py code_v2.py"},{"l":"B","t":"cp code.py code_v2.py"},{"l":"C","t":"touch code.py code_v2.py"},{"l":"D","t":"chmod code.py code_v2.py"}],"ans":"B","anst":"cp code.py code_v2.py"},{"n":335,"t":"Which command is used to move or rename a file in Linux?","type":"mc","opts":[{"l":"A","t":"cp"},{"l":"B","t":"mv"},{"l":"C","t":"rm"},{"l":"D","t":"touch"}],"ans":"B","anst":"mv"},{"n":336,"t":"Which command deletes a specific file?","type":"mc","opts":[{"l":"A","t":"rm"},{"l":"B","t":"rmdir"},{"l":"C","t":"clear"},{"l":"D","t":"deldir"}],"ans":"A","anst":"rm"},{"n":337,"t":"What command displays the text content of a file to the console?","type":"mc","opts":[{"l":"A","t":"echo"},{"l":"B","t":"cat"},{"l":"C","t":"chmod"},{"l":"D","t":"touch"}],"ans":"B","anst":"cat"},{"n":338,"t":"What does executing chmod +x script.sh do?","type":"mc","opts":[{"l":"A","t":"Deletes script.sh"},{"l":"B","t":"Makes script.sh executable"},{"l":"C","t":"Displays script.sh contents"},{"l":"D","t":"Encrypts script.sh"}],"ans":"B","anst":"Makes script.sh executable"},{"n":339,"t":"A computer network is best defined as:","type":"mc","opts":[{"l":"A","t":"An isolated partition"},{"l":"B","t":"Two or more computers linked together to share data, files, and resources"},{"l":"C","t":"Hypervisors on one CPU"},{"l":"D","t":"A motherboard chipset"}],"ans":"B","anst":"Two or more computers linked together to share data, files, and resources"},{"n":340,"t":"Which network type spans the smallest distance (typically a few meters)?","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"PAN"},{"l":"C","t":"MAN"},{"l":"D","t":"WAN"}],"ans":"B","anst":"PAN"},{"n":341,"t":"A smartwatch communicating with a phone via Bluetooth is an example of a:","type":"mc","opts":[{"l":"A","t":"MAN"},{"l":"B","t":"PAN"},{"l":"C","t":"WAN"},{"l":"D","t":"LAN"}],"ans":"B","anst":"PAN"},{"n":342,"t":"A network that spans a single building or college computer lab is a:","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"PAN"},{"l":"C","t":"WAN"},{"l":"D","t":"MAN"}],"ans":"A","anst":"LAN"},{"n":343,"t":"A city's cable TV or traffic-camera network is classified as a:","type":"mc","opts":[{"l":"A","t":"PAN"},{"l":"B","t":"MAN"},{"l":"C","t":"LAN"},{"l":"D","t":"SAN"}],"ans":"B","anst":"MAN"},{"n":344,"t":"A network connecting devices across countries or continents is a:","type":"mc","opts":[{"l":"A","t":"LAN"},{"l":"B","t":"WAN"},{"l":"C","t":"PAN"},{"l":"D","t":"MAN"}],"ans":"B","anst":"WAN"},{"n":345,"t":"Which network topology connects all devices to one central hub or switch?","type":"mc","opts":[{"l":"A","t":"Bus"},{"l":"B","t":"Star"},{"l":"C","t":"Ring"},{"l":"D","t":"Mesh"}],"ans":"B","anst":"Star"},{"n":346,"t":"In which topology do all connected devices share a single central cable?","type":"mc","opts":[{"l":"A","t":"Star"},{"l":"B","t":"Bus"},{"l":"C","t":"Mesh"},{"l":"D","t":"Ring"}],"ans":"B","anst":"Bus"},{"n":347,"t":"In a Ring topology, each individual device connects to:","type":"mc","opts":[{"l":"A","t":"Exactly one central switch"},{"l":"B","t":"Exactly two neighbors"},{"l":"C","t":"Every other node directly"},{"l":"D","t":"A wireless access point"}],"ans":"B","anst":"Exactly two neighbors"},{"n":348,"t":"Which topology features direct connections between every pair of nodes?","type":"mc","opts":[{"l":"A","t":"Bus"},{"l":"B","t":"Mesh"},{"l":"C","t":"Star"},{"l":"D","t":"Ring"}],"ans":"B","anst":"Mesh"},{"n":349,"t":"Which network protocol translates website URLs into numeric IP addresses?","type":"mc","opts":[{"l":"A","t":"DHCP"},{"l":"B","t":"DNS"},{"l":"C","t":"HTTP"},{"l":"D","t":"ARP"}],"ans":"B","anst":"DNS"},{"n":350,"t":"In Client-Server Architecture, the primary responsibility of the server is to:","type":"mc","opts":[{"l":"A","t":"Display UI graphics"},{"l":"B","t":"Receive requests, validate them, query databases, and return responses"},{"l":"C","t":"Manage Bluetooth pairings"},{"l":"D","t":"Convert signals from the ISP"}],"ans":"B","anst":"Receive requests, validate them, query databases, and return responses"},{"n":351,"t":"Which device directs traffic between different networks?","type":"mc","opts":[{"l":"A","t":"Switch"},{"l":"B","t":"Router"},{"l":"C","t":"Hub"},{"l":"D","t":"Access Point"}],"ans":"B","anst":"Router"},{"n":352,"t":"What makes a network switch smarter than a network hub?","type":"mc","opts":[{"l":"A","t":"It routes data across the Internet"},{"l":"B","t":"It sends data only where needed rather than broadcasting"},{"l":"C","t":"It works without power"},{"l":"D","t":"It generates domain names"}],"ans":"B","anst":"It sends data only where needed rather than broadcasting"},{"n":353,"t":"A legacy network hardware device that broadcasts incoming traffic to all ports is a:","type":"mc","opts":[{"l":"A","t":"Router"},{"l":"B","t":"Hub"},{"l":"C","t":"Switch"},{"l":"D","t":"Firewall"}],"ans":"B","anst":"Hub"},{"n":354,"t":"Which device converts signals between your ISP and your network?","type":"mc","opts":[{"l":"A","t":"Modem"},{"l":"B","t":"NIC"},{"l":"C","t":"Access Point"},{"l":"D","t":"Switch"}],"ans":"A","anst":"Modem"},{"n":355,"t":"What is the role of a Wireless Access Point (WAP)?","type":"mc","opts":[{"l":"A","t":"Resolves DNS domain queries"},{"l":"B","t":"Lets wireless devices join a wired network"},{"l":"C","t":"Runs guest operating systems"},{"l":"D","t":"Performs memory paging"}],"ans":"B","anst":"Lets wireless devices join a wired network"},{"n":356,"t":"What hardware inside a computer provides physical connectivity to a network?","type":"mc","opts":[{"l":"A","t":"Modem"},{"l":"B","t":"Network Interface Card (NIC)"},{"l":"C","t":"Hypervisor"},{"l":"D","t":"Motherboard Chipset"}],"ans":"B","anst":"Network Interface Card (NIC)"},{"n":357,"t":"What is a network protocol?","type":"mc","opts":[{"l":"A","t":"A networking cable"},{"l":"B","t":"A standardized set of rules and formats that govern how data is transmitted across a network"},{"l":"C","t":"A virtual machine monitor"},{"l":"D","t":"An operating system kernel"}],"ans":"B","anst":"A standardized set of rules and formats that govern how data is transmitted across a network"},{"n":358,"t":"The theoretical OSI reference model consists of how many layers?","type":"mc","opts":[{"l":"A","t":"4"},{"l":"B","t":"7"},{"l":"C","t":"5"},{"l":"D","t":"3"}],"ans":"B","anst":"7"},{"n":359,"t":"Which layer represents Layer 1 in the 7-layer OSI model?","type":"mc","opts":[{"l":"A","t":"Data Link Layer"},{"l":"B","t":"Physical Layer"},{"l":"C","t":"Network Layer"},{"l":"D","t":"Transport Layer"}],"ans":"B","anst":"Physical Layer"},{"n":360,"t":"In the OSI model, which layer handles node-to-node transfer and physical MAC addressing?","type":"mc","opts":[{"l":"A","t":"Physical Layer"},{"l":"B","t":"Data Link Layer (Layer 2)"},{"l":"C","t":"Network Layer"},{"l":"D","t":"Presentation Layer"}],"ans":"B","anst":"Data Link Layer (Layer 2)"},{"n":361,"t":"Logical addressing (IP) and routing path determination take place at which OSI layer?","type":"mc","opts":[{"l":"A","t":"Transport Layer"},{"l":"B","t":"Network Layer (Layer 3)"},{"l":"C","t":"Session Layer"},{"l":"D","t":"Application Layer"}],"ans":"B","anst":"Network Layer (Layer 3)"},{"n":362,"t":"Which OSI layer is responsible for end-to-end data delivery and error recovery?","type":"mc","opts":[{"l":"A","t":"Session Layer"},{"l":"B","t":"Transport Layer (Layer 4)"},{"l":"C","t":"Presentation Layer"},{"l":"D","t":"Data Link Layer"}],"ans":"B","anst":"Transport Layer (Layer 4)"},{"n":363,"t":"The practical TCP/IP suite that drives the Internet is structured into how many layers?","type":"mc","opts":[{"l":"A","t":"4"},{"l":"B","t":"7"},{"l":"C","t":"5"},{"l":"D","t":"6"}],"ans":"A","anst":"4"},{"n":364,"t":"Which layer of the TCP/IP stack determines the best path and handles packet routing?","type":"mc","opts":[{"l":"A","t":"Transport Layer"},{"l":"B","t":"Internet Layer"},{"l":"C","t":"Network Access Layer"},{"l":"D","t":"Application Layer"}],"ans":"B","anst":"Internet Layer"},{"n":365,"t":"Software that creates, runs, and manages virtual machines by sharing physical hardware is a:","type":"mc","opts":[{"l":"A","t":"Compiler"},{"l":"B","t":"Hypervisor"},{"l":"C","t":"Microkernel"},{"l":"D","t":"Device driver"}],"ans":"B","anst":"Hypervisor"},{"n":366,"t":"What is a Virtual Machine (VM)?","type":"mc","opts":[{"l":"A","t":"A hardware graphics card"},{"l":"B","t":"A software-based computer that behaves like a physical computer and runs its own OS"},{"l":"C","t":"An Ethernet switch"},{"l":"D","t":"A command-line terminal window"}],"ans":"B","anst":"A software-based computer that behaves like a physical computer and runs its own OS"},{"n":367,"t":"Running multiple virtual servers on a single physical host to save cost and energy is known as:","type":"mc","opts":[{"l":"A","t":"Server Consolidation"},{"l":"B","t":"Elastic Clustering"},{"l":"C","t":"Paging"},{"l":"D","t":"Load Shedding"}],"ans":"A","anst":"Server Consolidation"},{"n":368,"t":"What type of hypervisor installs as an application on an existing host operating system?","type":"mc","opts":[{"l":"A","t":"Type-1 Bare-Metal Hypervisor"},{"l":"B","t":"Type-2 Hosted Hypervisor"},{"l":"C","t":"Firmware Hypervisor"},{"l":"D","t":"Monolithic Kernel"}],"ans":"B","anst":"Type-2 Hosted Hypervisor"},{"n":369,"t":"Which VM management action saves the VM's exact state to return to later?","type":"mc","opts":[{"l":"A","t":"Clone"},{"l":"B","t":"Snapshot"},{"l":"C","t":"Stop"},{"l":"D","t":"Start"}],"ans":"B","anst":"Snapshot"},{"n":370,"t":"What disk image file format is attached to a VM to boot up and install an operating system?","type":"mc","opts":[{"l":"A","t":".tar"},{"l":"B","t":".iso"},{"l":"C","t":".dll"},{"l":"D","t":".sh"}],"ans":"B","anst":".iso"},{"n":371,"t":"The 5 NIST essential characteristics of cloud computing are On-Demand Self-Service, Broad Network Access, Resource Pooling, Rapid Elasticity, and:","type":"fib","ans":"","anst":"Measured Service"},{"n":372,"t":"In cloud computing, ___ Elasticity allows computing resources to scale up or down automatically based on demand.","type":"fib","ans":"","anst":"Rapid"},{"n":373,"t":"The cloud deployment model dedicated to one organization only is a:","type":"fib","ans":"","anst":"Private Cloud"},{"n":374,"t":"An architecture that integrates both public and private cloud platforms is a:","type":"fib","ans":"","anst":"Hybrid Cloud"},{"n":375,"t":"In the Pizza as a Service analogy, Infrastructure as a Service (IaaS) corresponds to:","type":"fib","ans":"","anst":"Take-and-bake pizza"},{"n":376,"t":"In Platform as a Service (PaaS), the customer manages applications and ___, while the provider manages the OS and runtime.","type":"fib","ans":"","anst":"Data"},{"n":377,"t":"Google App Engine and Microsoft Azure App Service are examples of the ___ cloud service model.","type":"fib","ans":"","anst":"PaaS (Platform as a Service)"},{"n":378,"t":"Amazon Web Services (AWS) was launched first in the year:","type":"fib","ans":"","anst":"2006"},{"n":379,"t":"In Linux, running cd .. navigates one level up to the:","type":"fib","ans":"","anst":"Parent directory"},{"n":380,"t":"A ___ topology connects all devices to one central hub or switch.","type":"fib","ans":"","anst":"Star"},{"n":381,"t":"The network device that connects different IP subnets and directs traffic between them is a:","type":"fib","ans":"","anst":"Router"},{"n":382,"t":"A network that spans an entire city is called a:","type":"fib","ans":"","anst":"MAN (Metropolitan Area Network)"},{"n":383,"t":"In the 7-layer OSI model, Layer 6 is the:","type":"fib","ans":"","anst":"Presentation Layer"},{"n":384,"t":"A complete, identical copy of an entire virtual machine is created using the ___ action.","type":"fib","ans":"","anst":"Clone"},{"n":385,"t":"In Linux, the command to assign execute permissions to an application is:","type":"fib","ans":"","anst":"chmod +x <filename>"},{"n":386,"t":"True/False: In a client-server architecture, the server initiates the request to the client browser.","type":"tf","ans":"False","anst":"False"},{"n":387,"t":"True/False: An RTOS guarantees a response within a strict time limit.","type":"tf","ans":"True","anst":"True"},{"n":388,"t":"True/False: The Linux command rmdir can delete a folder that still contains files.","type":"tf","ans":"False","anst":"False"},{"n":389,"t":"True/False: The practical TCP/IP suite consists of 4 functional layers.","type":"tf","ans":"True","anst":"True"},{"n":390,"t":"True/False: A network hub forwards incoming data packets only to the specific MAC address of the destination device.","type":"tf","ans":"False","anst":"False"},{"n":391,"t":"True/False: If one virtual machine crashes, peer VMs on the same hardware continue running safely.","type":"tf","ans":"True","anst":"True"},{"n":392,"t":"True/False: An .iso file is standard for attaching an OS installation image to a virtual machine.","type":"tf","ans":"True","anst":"True"},{"n":393,"t":"True/False: In a public cloud deployment model, physical computing hardware is shared among multiple independent tenants.","type":"tf","ans":"True","anst":"True"},{"n":394,"t":"True/False: Under Platform as a Service (PaaS), the customer is responsible for maintaining and patching the underlying operating system.","type":"tf","ans":"False","anst":"False"},{"n":395,"t":"True/False: Over 96% of the top 1 million web servers run on Linux.","type":"tf","ans":"True","anst":"True"},{"n":396,"t":"True/False: In a Star topology, if the central hub or switch fails, the entire network connected to it goes down.","type":"tf","ans":"True","anst":"True"},{"n":397,"t":"True/False: The Linux file tree begins with drive letters such as C: or D:.","type":"tf","ans":"False","anst":"False"},{"n":398,"t":"True/False: Broad Network Access allows cloud capabilities to be accessed over standard networks across various client devices.","type":"tf","ans":"True","anst":"True"},{"n":399,"t":"True/False: An Access Point connects wireless devices to an existing wired network.","type":"tf","ans":"True","anst":"True"},{"n":400,"t":"True/False: Under Software as a Service (SaaS), the end-user customer is responsible for managing hypervisors and runtime libraries.","type":"tf","ans":"False","anst":"False"}];
+<div class="quiz-result">
+   <h2>You have scored 4 out of 5.</h2>
+   <div class="question-container">
+   <div class="question">Who wrote the novel 'pride and Prejudice'?</div>
+   <div class="user-answer">Your answerer: Not answered</div>
+   <div class="correct-answer">Correct answer:correct answer</div>
+</div>
 
-const quizContainer = document.querySelector(".quiz-container");
-const resultContainer = document.querySelector(".quiz-result");
-const timerDisplay = document.querySelector(".quiz-container .timer");
-const questionEl = document.querySelector(".quiz-container .question");
-const optionsEl = document.querySelector(".quiz-container .options");
-const nextBtn = document.getElementById("nextBtn");
-const prevBtn = document.getElementById("prevBtn");
-const fibRow = document.getElementById("fibRow");
-const fibInput = document.getElementById("fibInput");
-const fibSubmit = document.getElementById("fibSubmit");
 
-const MAX_QUESTIONS = QUESTIONS.length;
-const SECONDS_PER_QUESTION = 25;
-const TEST_DURATION = MAX_QUESTIONS * SECONDS_PER_QUESTION;
+<div class="quiz-result">
+   <h2>You have scored 4 out of 5.</h2>
+   <div class="question-container">
+   <div class="question">Who wrote the novel 'pride and Prejudice'?</div>
+   <div class="user-answer">Your answerer: Not answered</div>
+   <div class="correct-answer">Correct answer:correct answer</div>
+</div>
 
-let active = [];
-let questionNumber = 0;
-let score = 0;
-let timeLeft = 0;
-let timerInterval;
 
-const shuffleArray = arr => {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-};
+<div class="quiz-result">
+   <h2>You have scored 4 out of 5.</h2>
+   <div class="question-container">
+   <div class="question">Who wrote the novel 'pride and Prejudice'?</div>
+   <div class="user-answer">Your answerer: Not answered</div>
+   <div class="correct-answer">Correct answer:correct answer</div>
+</div>
 
-const resetLocalStorage = () => {
-    for (let i = 0; i < MAX_QUESTIONS; i++) {
-        localStorage.removeItem(`userAnswer_${i}`);
-    }
-};
 
-function correctText(q) {
-    if (q.type === "mc") {
-        const o = q.opts.find(x => x.l === q.ans);
-        return o ? o.t : q.anst;
-    }
-    if (q.type === "tf") return q.ans;
-    return q.anst;
-}
+<div class="quiz-result">
+   <h2>You have scored 4 out of 5.</h2>
+   <div class="question-container">
+   <div class="question">Who wrote the novel 'pride and Prejudice'?</div>
+   <div class="user-answer">Your answerer: Not answered</div>
+   <div class="correct-answer">Correct answer:correct answer</div>
+</div>
 
-function fibMatch(input, ans) {
-    const ni = norm(input);
-    if (!ni) return false;
-    const candidates = [ans, ans.replace(/\([^)]*\)/g, "").trim()];
-    ans.split(/[;,]/).forEach(p => {
-        const t = p.trim().replace(/\([^)]*\)/g, "").trim();
-        if (t) candidates.push(t);
-    });
-    return candidates.some(c => c && norm(c) === ni);
-}
-function norm(s) {
-    return String(s).toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim();
-}
+<button class="retake-btn">Retake Quiz</button>
 
-function isCorrect(q, userText) {
-    if (!userText) return false;
-    const t = String(userText).trim();
-    if (q.type === "fib") return fibMatch(t, q.anst);
-    return t === correctText(q);
-}
+</div>
 
-const formatTime = seconds => {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-};
 
-const updateTimerDisplay = () => {
-    timerDisplay.textContent = `Time Left: ${formatTime(timeLeft)}`;
-    timerDisplay.classList.toggle("danger", timeLeft <= 300);
-};
 
-const startTestTimer = () => {
-    clearInterval(timerInterval);
-    timeLeft = TEST_DURATION;
-    updateTimerDisplay();
-    timerInterval = setInterval(() => {
-        timeLeft--;
-        if (timeLeft <= 0) {
-            timeLeft = 0;
-            updateTimerDisplay();
-            clearInterval(timerInterval);
-            displayQuizResult();
-            return;
-        }
-        updateTimerDisplay();
-    }, 1000);
-};
 
-function checkAnswer(userAnswer, el) {
-    const q = active[questionNumber];
-    const correct = correctText(q);
-    const ok = isCorrect(q, userAnswer);
 
-    if (ok) {
-        score++;
-        el.classList.add("correct");
-    } else {
-        el.classList.add("incorrect");
-    }
 
-    localStorage.setItem(`userAnswer_${questionNumber}`, String(userAnswer).trim());
 
-    const allOptions = document.querySelectorAll(".quiz-container .option");
-    allOptions.forEach(o => o.classList.add("disabled"));
-    fibInput.disabled = true;
-    fibSubmit.disabled = true;
 
-    if (!ok) {
-        allOptions.forEach(o => {
-            if (o.textContent.trim() === correct) o.classList.add("correct");
-        });
-    }
-}
 
-function buildOptions(q, savedUser) {
-    optionsEl.innerHTML = "";
-    fibRow.classList.add("hidden");
-    optionsEl.classList.remove("hidden");
 
-    const correct = correctText(q);
-    const locked = savedUser != null;
-    const qs = q.type === "tf" ? ["True", "False"] : q.opts.map(o => o.t);
 
-    qs.forEach(o => {
-        const option = document.createElement("button");
-        option.classList.add("option");
-        option.textContent = o;
-        if (locked) {
-            option.classList.add("disabled");
-            if (o === correct) option.classList.add("correct");
-            if (o === String(savedUser).trim() && o !== correct) option.classList.add("incorrect");
-        } else {
-            option.addEventListener("click", () => checkAnswer(o, option));
-        }
-        optionsEl.appendChild(option);
-    });
-}
 
-function buildFib(q, savedUser) {
-    optionsEl.classList.add("hidden");
-    fibRow.classList.remove("hidden");
-    fibInput.classList.remove("correct", "incorrect");
-    fibInput.value = savedUser != null ? savedUser : "";
 
-    if (savedUser != null) {
-        fibInput.disabled = true;
-        fibSubmit.disabled = true;
-        fibInput.classList.add(isCorrect(q, savedUser) ? "correct" : "incorrect");
-    } else {
-        fibInput.disabled = false;
-        fibSubmit.disabled = false;
-        fibInput.focus();
-    }
-}
 
-function createQuestion() {
-    optionsEl.innerHTML = "";
-    const q = active[questionNumber];
-    const savedUser = localStorage.getItem(`userAnswer_${questionNumber}`);
-    const tq = q.t.replace(/^True\/False:\s*/, "");
-    questionEl.innerHTML = `<span class="question-number">${questionNumber + 1}/${MAX_QUESTIONS}</span> ${tq}`;
 
-    if (q.type === "fib") {
-        buildFib(q, savedUser);
-    } else {
-        buildOptions(q, savedUser);
-    }
 
-    nextBtn.textContent = questionNumber >= MAX_QUESTIONS - 1 ? "Finish" : "Next";
-    prevBtn.disabled = questionNumber === 0;
-}
-
-fibSubmit.addEventListener("click", () => {
-    if (!fibInput.disabled) {
-        const val = fibInput.value.trim();
-        if (!val) { fibInput.focus(); return; }
-        checkAnswer(val, fibInput);
-        if (isCorrect(active[questionNumber], val)) fibInput.classList.add("correct");
-        else fibInput.classList.add("incorrect");
-    }
-});
-fibInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") fibSubmit.click();
-});
-
-const displayNextQuestion = () => {
-    if (questionNumber >= MAX_QUESTIONS - 1) {
-        displayQuizResult();
-        return;
-    }
-    questionNumber++;
-    createQuestion();
-};
-nextBtn.addEventListener("click", displayNextQuestion);
-
-const displayPrevQuestion = () => {
-    if (questionNumber > 0) {
-        questionNumber--;
-        createQuestion();
-    }
-};
-prevBtn.addEventListener("click", displayPrevQuestion);
-
-const getResultMessage = () => {
-    const pct = score / MAX_QUESTIONS;
-    if (pct === 1) return "Outstanding! Perfect score.";
-    if (pct >= 0.75) return "Very good.";
-    if (pct >= 0.5) return "Good. Keep practising the weak spots.";
-    if (pct >= 0.25) return "Do hard work — revisit the review list below.";
-    return "Better luck next time.";
-};
-
-const displayQuizResult = () => {
-    clearInterval(timerInterval);
-    resultContainer.style.display = "flex";
-    quizContainer.style.display = "none";
-    resultContainer.innerHTML = "";
-
-    const heading = document.createElement("h2");
-    heading.innerHTML = `You have scored ${score} out of ${MAX_QUESTIONS}.`;
-    resultContainer.appendChild(heading);
-
-    const msg = document.createElement("h3");
-    msg.innerHTML = getResultMessage();
-    resultContainer.appendChild(msg);
-
-    const legend = document.createElement("div");
-    legend.className = "result-legend";
-    legend.innerHTML = '<span><span class="dot g"></span> Correct</span><span><span class="dot r"></span> Wrong / Not answered</span>';
-    resultContainer.appendChild(legend);
-
-    for (let i = 0; i < MAX_QUESTIONS; i++) {
-        const q = active[i];
-        const userAnswer = localStorage.getItem(`userAnswer_${i}`);
-        const ok = isCorrect(q, userAnswer);
-
-        const item = document.createElement("div");
-        item.classList.add("question-container");
-        item.classList.add(ok ? "correct-item" : "incorrect-item");
-
-        const showQ = q.t.replace(/^True\/False:\s*/, "");
-        const userText = userAnswer && userAnswer.trim() ? userAnswer.trim() : "Not answered";
-
-        item.innerHTML = `
-            <div class="question"><span class="qno">Q${q.n}</span>${showQ}</div>
-            <div class="user-answer ${ok ? "good" : "bad"}">Your answer: ${userText}</div>
-            <div class="correct-answer">Correct answer: ${correctText(q)}</div>`;
-
-        resultContainer.appendChild(item);
-    }
-
-    const retakeBtn = document.createElement("button");
-    retakeBtn.classList.add("retake-btn");
-    retakeBtn.innerHTML = "Retake Quiz";
-    retakeBtn.addEventListener("click", retakeQuiz);
-    resultContainer.appendChild(retakeBtn);
-
-    window.scrollTo({ top: 0 });
-};
-
-const retakeQuiz = () => {
-    questionNumber = 0;
-    score = 0;
-    active = shuffleArray(active);
-    resetLocalStorage();
-
-    startTestTimer();
-    createQuestion();
-    resultContainer.style.display = "none";
-    quizContainer.style.display = "block";
-    window.scrollTo({ top: 0 });
-};
-
-active = shuffleArray(QUESTIONS);
-resetLocalStorage();
-startTestTimer();
-createQuestion();
-</script>
+    <script src="your.js"></script>
 </body>
 </html>
